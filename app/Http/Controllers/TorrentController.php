@@ -85,7 +85,7 @@ class TorrentController extends Controller
         $user = $request->user();
 
         $torrent = Torrent::withoutGlobalScope(ApprovedScope::class)
-            ->with(['user', 'comments', 'category', 'type', 'resolution', 'subtitles', 'playlists', 'reports', 'featured'])
+            ->with(['user', 'comments', 'category', 'type', 'resolution', 'subtitles', 'playlists', 'reports', 'featured', 'files'])
             ->withCount([
                 'bookmarks',
                 'seeds'   => fn ($query) => $query->where('active', '=', true)->where('visible', '=', true),
@@ -140,6 +140,51 @@ class TorrentController extends Controller
                 ->find($torrent->igdb);
         }
 
+        $fileTree = [];
+
+        foreach ($torrent->files->sortBy('name') as $index => $file) {
+            $parts = explode('/', trim($file->name, '/'));
+
+            $current = &$fileTree;
+
+            for ($i = 0; $i < \count($parts) - 1; $i++) {
+                $part = $parts[$i];
+
+                /** @phpstan-ignore function.impossibleType (PHPStan doesn't recognize that $current might not be empty in subsequent loops)*/
+                if (!\array_key_exists($part, $current)) {
+                    $current[$part] = [
+                        'type'     => 'directory',
+                        'children' => [],
+                    ];
+                }
+
+                $current = &$current[$part]['children'];
+            }
+
+            $current[$parts[$i]] = [
+                'type' => 'file',
+                'size' => $file->size,
+            ];
+        }
+
+        $calculateTotals = function (array &$children) use (&$calculateTotals): array {
+            $totalSize = 0;
+            $totalCount = 0;
+
+            foreach ($children as &$child) {
+                if ($child['type'] === 'directory') {
+                    [$child['size'], $child['count']] = $calculateTotals($child['children']);
+                }
+
+                $totalSize += $child['size'];
+                $totalCount += $child['count'] ?? 1;
+            }
+
+            return [$totalSize, $totalCount];
+        };
+
+        $calculateTotals($fileTree);
+
         return view('torrent.show', [
             'torrent' => $torrent,
             'user'    => $user,
@@ -160,6 +205,7 @@ class TorrentController extends Controller
             'last_seed_activity' => History::where('torrent_id', '=', $torrent->id)->where('seeder', '=', 1)->latest('updated_at')->first(),
             'playlists'          => $user->playlists,
             'audits'             => Audit::with('user')->where('model_entry_id', '=', $torrent->id)->where('model_name', '=', 'Torrent')->latest()->get(),
+            'fileTree'           => $fileTree,
         ]);
     }
 
