@@ -436,7 +436,6 @@ class ChatController extends Controller
     public function updateUserChatStatus(Request $request): \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
     {
         $user = $request->user();
-        $user->load(['chatStatus', 'chatroom', 'group', 'echoes']);
         $status = ChatStatus::findOrFail($request->integer('status_id'));
 
         $this->chatRepository->systemMessage('[url=/users/'.$user->username.']'.$user->username.'[/url] has updated their status to [b]'.$status->name.'[/b]');
@@ -451,7 +450,6 @@ class ChatController extends Controller
     public function updateUserRoom(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
-        $user->load(['chatStatus', 'chatroom', 'group', 'echoes']);
         $room = Chatroom::findOrFail($request->integer('room_id'));
 
         $user->chatroom()->dissociate();
