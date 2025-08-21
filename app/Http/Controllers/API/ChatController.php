@@ -163,14 +163,10 @@ class ChatController extends Controller
 
         if (str_starts_with($message, '/msg')) {
             $which = 'skip';
-            $command = @explode(' ', $message);
+            [, $username, $message] = mb_split(' +', trim($message), 3) + [null, null, ''];
 
-            if (\array_key_exists(1, $command)) {
-                $receiverId = User::where('username', 'like', $command[1])->sole()->id;
-                $clone = $command;
-                array_shift($clone);
-                array_shift($clone);
-                $message = trim(implode(' ', $clone));
+            if ($username !== null) {
+                $receiverId = User::where('username', '=', $username)->soleValue('id');
             }
 
             $botId = 1;
