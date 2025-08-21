@@ -146,7 +146,7 @@ class ChatController extends Controller
         $user = $request->user();
 
         $userId = $user->id;
-        $receiverId = $request->input('receiver_id');
+        $receiverId = $request->integer('receiver_id');
         $roomId = $request->input('chatroom_id');
         $botId = $request->input('bot_id');
         $message = $request->input('message');
@@ -246,12 +246,10 @@ class ChatController extends Controller
                 );
 
                 if ($echoes->doesntContain(fn ($echo) => $echo->target_id == $user2Id)) {
-                    UserEcho::create([
+                    $echoes->push(UserEcho::create([
                         'user_id'   => $user1Id,
                         'target_id' => $user2Id,
-                    ]);
-
-                    $echoes = UserEcho::with(['room', 'target', 'bot'])->where('user_id', '=', $user1Id)->get();
+                    ]));
 
                     cache()->put('user-echoes'.$user1Id, $echoes, 3600);
 
@@ -268,13 +266,11 @@ class ChatController extends Controller
                 );
 
                 if ($audibles->doesntContain(fn ($audible) => $audible->target_id == $user2Id)) {
-                    UserAudible::create([
+                    $audibles->push(UserAudible::create([
                         'user_id'   => $user1Id,
                         'target_id' => $user2Id,
-                        'status'    => false,
-                    ]);
-
-                    $audibles = UserAudible::with(['room', 'target', 'bot'])->where('user_id', '=', $user1Id)->get();
+                        'status'    => 1,
+                    ]));
 
                     cache()->put('user-audibles'.$user1Id, $audibles, 3600);
 
@@ -465,12 +461,10 @@ class ChatController extends Controller
         );
 
         if ($echoes->doesntContain(fn ($echo) => $echo->room_id == $room->id)) {
-            UserEcho::create([
+            $echoes->push(UserEcho::create([
                 'user_id' => $user->id,
                 'room_id' => $room->id,
-            ]);
-
-            $echoes = UserEcho::with(['room', 'target', 'bot'])->where('user_id', '=', $user->id)->get();
+            ]));
 
             cache()->put('user-echoes'.$user->id, $echoes, 3600);
 
