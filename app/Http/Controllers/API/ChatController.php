@@ -149,7 +149,7 @@ class ChatController extends Controller
         $receiverId = $request->integer('receiver_id');
         $roomId = $request->input('chatroom_id');
         $botId = $request->input('bot_id');
-        $message = $request->input('message');
+        $message = (string) $request->input('message');
         $targeted = $request->input('targeted');
 
         if (!($user->can_chat ?? $user->group->can_chat)) {
@@ -163,9 +163,9 @@ class ChatController extends Controller
         $runbot = null;
         $trip = 'msg';
 
-        if ($message && str_starts_with((string) $message, '/'.$trip)) {
+        if ($message && str_starts_with($message, '/'.$trip)) {
             $which = 'skip';
-            $command = @explode(' ', (string) $message);
+            $command = @explode(' ', $message);
 
             if (\array_key_exists(1, $command)) {
                 $receiverId = User::where('username', 'like', $command[1])->sole()->id;
@@ -180,10 +180,10 @@ class ChatController extends Controller
 
         $trip = 'gift';
 
-        if ($message && str_starts_with((string) $message, '/'.$trip)) {
+        if ($message && str_starts_with($message, '/'.$trip)) {
             $which = 'echo';
             $target = 'system';
-            $message = '/bot gift'.substr((string) $message, \strlen($trip) + 1, \strlen((string) $message));
+            $message = '/bot gift'.substr($message, \strlen($trip) + 1, \strlen($message));
         }
 
         if ($target == 'system') {
@@ -192,24 +192,24 @@ class ChatController extends Controller
 
         if ($which == null) {
             foreach ($bots as $bot) {
-                if ($message && str_starts_with((string) $message, '/'.$bot->command)) {
+                if ($message && str_starts_with($message, '/'.$bot->command)) {
                     $which = 'echo';
-                } elseif ($message && str_starts_with((string) $message, '!'.$bot->command)) {
+                } elseif ($message && str_starts_with($message, '!'.$bot->command)) {
                     $which = 'public';
-                } elseif ($message && str_starts_with((string) $message, '@'.$bot->command)) {
-                    $message = substr((string) $message, 1 + \strlen((string) $bot->command), \strlen((string) $message));
+                } elseif ($message && str_starts_with($message, '@'.$bot->command)) {
+                    $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
                     $which = 'private';
                 } elseif ($message && $receiverId == 1 && $bot->id == $botId) {
-                    if (str_starts_with((string) $message, '/'.$bot->command)) {
-                        $message = substr((string) $message, 1 + \strlen((string) $bot->command), \strlen((string) $message));
+                    if (str_starts_with($message, '/'.$bot->command)) {
+                        $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
                     }
 
-                    if ($message && str_starts_with((string) $message, '!'.$bot->command)) {
-                        $message = substr((string) $message, 1 + \strlen((string) $bot->command), \strlen((string) $message));
+                    if ($message && str_starts_with($message, '!'.$bot->command)) {
+                        $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
                     }
 
-                    if ($message && str_starts_with((string) $message, '@'.$bot->command)) {
-                        $message = substr((string) $message, 1 + \strlen((string) $bot->command), \strlen((string) $message));
+                    if ($message && str_starts_with($message, '@'.$bot->command)) {
+                        $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
                     }
 
                     $which = 'message';
