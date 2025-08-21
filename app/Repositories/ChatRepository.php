@@ -17,7 +17,6 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Events\Chatter;
-use App\Events\MessageDeleted;
 use App\Events\MessageSent;
 use App\Http\Resources\ChatMessageResource;
 use App\Models\Bot;
@@ -25,8 +24,6 @@ use App\Models\Chatroom;
 use App\Models\ChatStatus;
 use App\Models\Message;
 use App\Models\User;
-use App\Models\UserAudible;
-use App\Models\UserEcho;
 use Illuminate\Support\Str;
 
 class ChatRepository
@@ -34,66 +31,8 @@ class ChatRepository
     /**
      * ChatRepository Constructor.
      */
-    public function __construct(private readonly Message $message, private readonly Chatroom $chatroom, private readonly ChatStatus $chatStatus, private readonly User $user, private readonly Bot $bot, private readonly UserEcho $userEcho, private readonly UserAudible $userAudible)
+    public function __construct(private readonly Message $message, private readonly Chatroom $chatroom, private readonly ChatStatus $chatStatus, private readonly User $user)
     {
-    }
-
-    public function config(): mixed
-    {
-        return config('chat');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, Bot>
-     */
-    public function bots(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->bot->all();
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, UserEcho>
-     */
-    public function echoes(int $userId): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->userEcho->with([
-            'bot',
-            'user',
-            'target',
-            'room',
-        ])
-            ->where('user_id', '=', $userId)
-            ->oldest('id')
-            ->get();
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, UserAudible>
-     */
-    public function audibles(int $userId): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->userAudible->with([
-            'bot',
-            'user',
-            'target',
-            'room',
-        ])
-            ->where('user_id', '=', $userId)
-            ->latest()
-            ->get();
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, Chatroom>
-     */
-    public function rooms(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->chatroom->all();
-    }
-
-    public function roomFindOrFail(int $id): Chatroom
-    {
-        return $this->chatroom->findOrFail($id);
     }
 
     public function message(int $userId, int $roomId, string $message, ?int $receiver = null, ?int $bot = null): Message
@@ -101,8 +40,6 @@ class ChatRepository
         if ($this->user->find($userId)->settings->censor) {
             $message = $this->censorMessage($message);
         }
-
-        $message = $this->htmlifyMessage($message);
 
         $message = $this->message->create([
             'user_id'     => $userId,
@@ -127,7 +64,6 @@ class ChatRepository
             $message = $this->censorMessage($message);
         }
 
-        $message = $this->htmlifyMessage($message);
         $save = $this->message->create([
             'bot_id'      => $botId,
             'user_id'     => 1,
@@ -154,8 +90,6 @@ class ChatRepository
         if ($this->user->find($userId)->settings->censor) {
             $message = $this->censorMessage($message);
         }
-
-        $message = $this->htmlifyMessage($message);
 
         $save = $this->message->create([
             'user_id'     => $userId,
@@ -184,17 +118,6 @@ class ChatRepository
         }
 
         return $message;
-    }
-
-    public function deleteMessage(int $id): void
-    {
-        $message = $this->message->find($id);
-
-        if ($message) {
-            broadcast(new MessageDeleted($message));
-
-            $message->delete();
-        }
     }
 
     /**
@@ -315,14 +238,6 @@ class ChatRepository
         return $room;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, ChatStatus>
-     */
-    public function statuses(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->chatStatus->all();
-    }
-
     public function status(int|User $user): ?ChatStatus
     {
         $status = null;
@@ -336,11 +251,6 @@ class ChatRepository
         }
 
         return $status;
-    }
-
-    public function statusFindOrFail(int $id): ChatStatus
-    {
-        return $this->chatStatus->findOrFail($id);
     }
 
     protected function censorMessage(string $message): string
@@ -357,11 +267,6 @@ class ChatRepository
             }
         }
 
-        return $message;
-    }
-
-    protected function htmlifyMessage(string $message): string
-    {
         return $message;
     }
 }

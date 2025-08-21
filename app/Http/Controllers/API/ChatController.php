@@ -19,6 +19,7 @@ namespace App\Http\Controllers\API;
 use App\Bots\NerdBot;
 use App\Bots\SystemBot;
 use App\Events\Chatter;
+use App\Events\MessageDeleted;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BotResource;
 use App\Http\Resources\ChatMessageResource;
@@ -26,6 +27,8 @@ use App\Http\Resources\ChatRoomResource;
 use App\Http\Resources\UserAudibleResource;
 use App\Http\Resources\UserEchoResource;
 use App\Models\Bot;
+use App\Models\Chatroom;
+use App\Models\ChatStatus;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\UserAudible;
@@ -49,55 +52,63 @@ class ChatController extends Controller
     /* STATUSES */
     public function statuses(): \Illuminate\Http\JsonResponse
     {
-        return response()->json($this->chatRepository->statuses());
+        return response()->json(ChatStatus::all());
     }
 
     /* ECHOES */
     public function echoes(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $user = $request->user()->load(['echoes']);
+        $echoes = UserEcho::query()
+            ->whereBelongsTo($request->user())
+            ->with(['bot', 'user', 'target', 'room'])
+            ->oldest('id')
+            ->get();
 
-        if ($user->echoes->isEmpty()) {
-            $userEcho = new UserEcho();
-            $userEcho->user_id = $request->user()->id;
-            $userEcho->room_id = 1;
-            $userEcho->save();
+        if ($echoes->isEmpty()) {
+            $echoes->push(UserEcho::create([
+                'user_id' => $request->user()->id,
+                'room_id' => 1,
+            ]));
         }
 
-        return UserEchoResource::collection($this->chatRepository->echoes($request->user()->id));
+        return UserEchoResource::collection($echoes);
     }
 
     /* AUDIBLES */
     public function audibles(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $user = $request->user()->load(['audibles']);
+        $audibles = UserAudible::query()
+            ->whereBelongsTo($request->user())
+            ->with(['bot', 'user', 'target', 'room'])
+            ->latest()
+            ->get();
 
-        if ($user->audibles->isEmpty()) {
-            $userAudible = new UserAudible();
-            $userAudible->user_id = $request->user()->id;
-            $userAudible->room_id = 1;
-            $userAudible->status = true;
-            $userAudible->save();
+        if ($audibles->isEmpty()) {
+            $audibles->prepend(UserAudible::create([
+                'user_id' => $request->user()->id,
+                'room_id' => 1,
+                'status'  => true,
+            ]));
         }
 
-        return UserAudibleResource::collection($this->chatRepository->audibles($request->user()->id));
+        return UserAudibleResource::collection($audibles);
     }
 
     /* BOTS */
     public function bots(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        return BotResource::collection($this->chatRepository->bots());
+        return BotResource::collection(Bot::all());
     }
 
     /* ROOMS */
     public function rooms(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        return ChatRoomResource::collection($this->chatRepository->rooms());
+        return ChatRoomResource::collection(Chatroom::all());
     }
 
     public function config(): \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
     {
-        return response($this->chatRepository->config());
+        return response(config('chat'));
     }
 
     /* MESSAGES */
@@ -303,7 +314,9 @@ class ChatController extends Controller
 
         abort_if($changedByStaff && !$request->user()->group->is_owner && $request->user()->group->level <= $message->user->group->level, 403);
 
-        $this->chatRepository->deleteMessage($id);
+        broadcast(new MessageDeleted($message));
+
+        $message->delete();
 
         return response('success');
     }
@@ -311,10 +324,10 @@ class ChatController extends Controller
     public function deleteRoomEcho(Request $request): \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
     {
         $user = $request->user();
-        UserEcho::where('user_id', '=', $user->id)->where('room_id', '=', $request->input('room_id'))->delete();
+        UserEcho::where('user_id', '=', $user->id)->where('room_id', '=', $request->integer('room_id'))->delete();
 
         $user->load(['chatStatus', 'chatroom', 'group', 'echoes']);
-        $room = $this->chatRepository->roomFindOrFail($request->input('room_id'));
+        $room = Chatroom::findOrFail($request->integer('room_id'));
 
         $user->chatroom()->dissociate();
         $user->chatroom()->associate($room);
@@ -424,7 +437,7 @@ class ChatController extends Controller
     {
         $user = $request->user();
         $user->load(['chatStatus', 'chatroom', 'group', 'echoes']);
-        $status = $this->chatRepository->statusFindOrFail($request->input('status_id'));
+        $status = ChatStatus::findOrFail($request->integer('status_id'));
 
         $this->chatRepository->systemMessage('[url=/users/'.$user->username.']'.$user->username.'[/url] has updated their status to [b]'.$status->name.'[/b]');
 
@@ -439,7 +452,7 @@ class ChatController extends Controller
     {
         $user = $request->user();
         $user->load(['chatStatus', 'chatroom', 'group', 'echoes']);
-        $room = $this->chatRepository->roomFindOrFail($request->input('room_id'));
+        $room = Chatroom::findOrFail($request->integer('room_id'));
 
         $user->chatroom()->dissociate();
         $user->chatroom()->associate($room);
