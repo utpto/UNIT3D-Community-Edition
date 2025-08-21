@@ -122,7 +122,7 @@ class SystemBot
     /**
      * Process Message.
      */
-    public function process(string $type, User $user, string $message = ''): \Illuminate\Http\Response|bool|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
+    public function process(string $type, User $user, string $message = ''): \Illuminate\Http\Response|bool
     {
         $this->target = $user;
 
@@ -169,7 +169,7 @@ class SystemBot
     /**
      * Output Message.
      */
-    public function pm(): \Illuminate\Http\Response|bool|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
+    public function pm(): \Illuminate\Http\Response|true
     {
         $type = $this->type;
         $target = $this->target;

@@ -232,7 +232,7 @@ class NerdBot
     /**
      * Process Message.
      */
-    public function process(string $type, User $user, string $message = ''): true|\Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory
+    public function process(string $type, User $user, string $message = ''): true|\Illuminate\Http\Response
     {
         $this->target = $user;
 
@@ -292,7 +292,7 @@ class NerdBot
     /**
      * Output Message.
      */
-    public function pm(): true|\Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory
+    public function pm(): true|\Illuminate\Http\Response
     {
         $type = $this->type;
         $target = $this->target;

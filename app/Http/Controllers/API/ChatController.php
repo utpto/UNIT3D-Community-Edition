@@ -142,7 +142,6 @@ class ChatController extends Controller
 
     public function createMessage(Request $request): \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|bool|ChatMessageResource
     {
-        $bot = null;
         $user = $request->user();
 
         $userId = $user->id;
@@ -158,7 +157,6 @@ class ChatController extends Controller
         $bots = cache()->remember('bots', 3600, fn () => Bot::where('active', '=', 1)->orderByDesc('position')->get());
 
         $which = null;
-        $runbot = null;
 
         if (str_starts_with($message, '/msg')) {
             $which = 'skip';
@@ -174,7 +172,8 @@ class ChatController extends Controller
         if (str_starts_with($message, '/gift')) {
             $which = 'echo';
             $message = '/bot gift'.substr($message, strlen('/gift'), \strlen($message));
-            $runbot = new SystemBot($this->chatRepository);
+
+            return new SystemBot($this->chatRepository)->process($which, $request->user(), $message);
         }
 
         if ($which == null) {
@@ -191,21 +190,15 @@ class ChatController extends Controller
                 }
 
                 if ($which != null) {
-                    break;
+                    if ($bot->is_systembot) {
+                        return new SystemBot($this->chatRepository)->process($which, $request->user(), $message);
+                    }
+
+                    if ($bot->is_nerdbot) {
+                        return new NerdBot($this->chatRepository)->process($which, $request->user(), $message);
+                    }
                 }
             }
-        }
-
-        if ($which != null && $which != 'skip' && !$runbot) {
-            if ($bot->is_systembot) {
-                $runbot = new SystemBot($this->chatRepository);
-            } elseif ($bot->is_nerdbot) {
-                $runbot = new NerdBot($this->chatRepository);
-            }
-        }
-
-        if ($runbot !== null) {
-            return $runbot->process($which ?? '', $request->user(), $message);
         }
 
         if ($receiverId && $receiverId > 0) {
