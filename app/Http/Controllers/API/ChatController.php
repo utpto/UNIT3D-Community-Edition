@@ -156,10 +156,7 @@ class ChatController extends Controller
 
         $bots = cache()->remember('bots', 3600, fn () => Bot::where('active', '=', 1)->orderByDesc('position')->get());
 
-        $which = null;
-
         if (str_starts_with($message, '/msg')) {
-            $which = 'skip';
             [, $username, $message] = mb_split(' +', trim($message), 3) + [null, null, ''];
 
             if ($username !== null) {
@@ -167,29 +164,21 @@ class ChatController extends Controller
             }
 
             $botId = 1;
-        }
+        } elseif (str_starts_with($message, '/gift')) {
+            $message = '/bot gift'.substr($message, \strlen('/gift'), \strlen($message));
 
-        if (str_starts_with($message, '/gift')) {
-            $which = 'echo';
-            $message = '/bot gift'.substr($message, strlen('/gift'), \strlen($message));
-
-            return new SystemBot($this->chatRepository)->process($which, $request->user(), $message);
-        }
-
-        if ($which == null) {
+            return new SystemBot($this->chatRepository)->process('echo', $request->user(), $message);
+        } else {
             foreach ($bots as $bot) {
-                if (str_starts_with($message, '/'.$bot->command)) {
-                    $which = 'echo';
-                } elseif (str_starts_with($message, '!'.$bot->command)) {
-                    $which = 'public';
-                } elseif (str_starts_with($message, '@'.$bot->command)) {
-                    $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
-                    $which = 'private';
-                } elseif ($message && $receiverId == 1 && $bot->id == $botId) {
-                    $which = 'message';
-                }
+                $which = match (true) {
+                    str_starts_with($message, '/'.$bot->command)         => 'echo',
+                    str_starts_with($message, '!'.$bot->command)         => 'public',
+                    str_starts_with($message, '@'.$bot->command)         => 'private',
+                    $message && $receiverId === 1 && $bot->id === $botId => 'message',
+                    default                                              => null,
+                };
 
-                if ($which != null) {
+                if ($which !== null) {
                     if ($bot->is_systembot) {
                         return new SystemBot($this->chatRepository)->process($which, $request->user(), $message);
                     }
