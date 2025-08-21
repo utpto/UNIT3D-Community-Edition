@@ -159,7 +159,6 @@ class ChatController extends Controller
         $bots = cache()->remember('bots', 3600, fn () => Bot::where('active', '=', 1)->orderByDesc('position')->get());
 
         $which = null;
-        $target = null;
         $runbot = null;
         $trip = 'msg';
 
@@ -182,11 +181,7 @@ class ChatController extends Controller
 
         if (str_starts_with($message, '/'.$trip)) {
             $which = 'echo';
-            $target = 'system';
             $message = '/bot gift'.substr($message, \strlen($trip) + 1, \strlen($message));
-        }
-
-        if ($target == 'system') {
             $runbot = new SystemBot($this->chatRepository);
         }
 
