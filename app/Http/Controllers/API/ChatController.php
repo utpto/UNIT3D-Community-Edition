@@ -151,7 +151,6 @@ class ChatController extends Controller
         $botId = $request->input('bot_id');
         $message = $request->input('message');
         $targeted = $request->input('targeted');
-        $save = $request->get('save');
 
         if (!($user->can_chat ?? $user->group->can_chat)) {
             return response('error', 401);
@@ -280,7 +279,6 @@ class ChatController extends Controller
 
             $roomId = 0;
             $ignore = $botId > 0 && $receiverId == 1 ? true : null;
-            $save = true;
             $echo = true;
             $message = $this->chatRepository->privateMessage($userId, $roomId, $message, $receiverId, null, $ignore);
         } else {
@@ -289,11 +287,7 @@ class ChatController extends Controller
             $message = $this->chatRepository->message($userId, $roomId, $message, $receiverId, $botId);
         }
 
-        if (!$save) {
-            $message->delete();
-        }
-
-        if ($save && $echo) {
+        if ($echo) {
             return new ChatMessageResource($message);
         }
 
