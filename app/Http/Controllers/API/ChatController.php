@@ -160,9 +160,8 @@ class ChatController extends Controller
 
         $which = null;
         $runbot = null;
-        $trip = 'msg';
 
-        if (str_starts_with($message, '/'.$trip)) {
+        if (str_starts_with($message, '/msg')) {
             $which = 'skip';
             $command = @explode(' ', $message);
 
@@ -177,11 +176,9 @@ class ChatController extends Controller
             $botId = 1;
         }
 
-        $trip = 'gift';
-
-        if (str_starts_with($message, '/'.$trip)) {
+        if (str_starts_with($message, '/gift')) {
             $which = 'echo';
-            $message = '/bot gift'.substr($message, \strlen($trip) + 1, \strlen($message));
+            $message = '/bot gift'.substr($message, strlen('/gift'), \strlen($message));
             $runbot = new SystemBot($this->chatRepository);
         }
 
