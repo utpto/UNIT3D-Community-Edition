@@ -135,7 +135,7 @@ class ChatController extends Controller
             $runbot = new NerdBot($this->chatRepository);
         }
 
-        $runbot->process('message', $request->user(), '', 0);
+        $runbot->process('message', $request->user(), '');
 
         return ChatMessageResource::collection($this->chatRepository->botMessages($request->user()->id, $bot->id));
     }
@@ -150,7 +150,6 @@ class ChatController extends Controller
         $roomId = $request->input('chatroom_id');
         $botId = $request->input('bot_id');
         $message = (string) $request->input('message');
-        $targeted = $request->input('targeted');
 
         if (!($user->can_chat ?? $user->group->can_chat)) {
             return response('error', 401);
@@ -206,7 +205,7 @@ class ChatController extends Controller
         }
 
         if ($runbot !== null) {
-            return $runbot->process($which ?? '', $request->user(), $message, 0);
+            return $runbot->process($which ?? '', $request->user(), $message);
         }
 
         if ($receiverId && $receiverId > 0) {
