@@ -233,8 +233,6 @@ class ChatController extends Controller
             return $runbot->process($which ?? '', $request->user(), $message, 0);
         }
 
-        $echo = false;
-
         if ($receiverId && $receiverId > 0) {
             // Create echo for both users if missing
             foreach ([[$userId, $receiverId], [$receiverId, $userId]] as [$user1Id, $user2Id]) {
@@ -279,17 +277,14 @@ class ChatController extends Controller
 
             $roomId = 0;
             $ignore = $botId > 0 && $receiverId == 1 ? true : null;
-            $echo = true;
             $message = $this->chatRepository->privateMessage($userId, $roomId, $message, $receiverId, null, $ignore);
-        } else {
-            $receiverId = null;
-            $botId = null;
-            $message = $this->chatRepository->message($userId, $roomId, $message, $receiverId, $botId);
-        }
 
-        if ($echo) {
             return new ChatMessageResource($message);
         }
+
+        $receiverId = null;
+        $botId = null;
+        $message = $this->chatRepository->message($userId, $roomId, $message, $receiverId, $botId);
 
         return response('success');
     }
