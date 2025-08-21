@@ -192,18 +192,6 @@ class ChatController extends Controller
                     $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
                     $which = 'private';
                 } elseif ($message && $receiverId == 1 && $bot->id == $botId) {
-                    if (str_starts_with($message, '/'.$bot->command)) {
-                        $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
-                    }
-
-                    if (str_starts_with($message, '!'.$bot->command)) {
-                        $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
-                    }
-
-                    if (str_starts_with($message, '@'.$bot->command)) {
-                        $message = substr($message, 1 + \strlen($bot->command), \strlen($message));
-                    }
-
                     $which = 'message';
                 }
 
