@@ -196,7 +196,7 @@ class ChatController extends Controller
                 $echoes = cache()->remember(
                     'user-echoes'.$user1Id,
                     3600,
-                    fn () => UserEcho::with(['room', 'target', 'bot'])->where('user_id', '=', $user1Id)->get()
+                    fn () => UserEcho::with(['user', 'room', 'target', 'bot'])->where('user_id', '=', $user1Id)->get()
                 );
 
                 if ($echoes->doesntContain(fn ($echo) => $echo->target_id == $user2Id)) {
@@ -216,7 +216,7 @@ class ChatController extends Controller
                 $audibles = cache()->remember(
                     'user-audibles'.$user1Id,
                     3600,
-                    fn () => UserAudible::with(['room', 'target', 'bot'])->where('user_id', '=', $user1Id)->get()
+                    fn () => UserAudible::with(['user', 'room', 'target', 'bot'])->where('user_id', '=', $user1Id)->get()
                 );
 
                 if ($audibles->doesntContain(fn ($audible) => $audible->target_id == $user2Id)) {
@@ -403,7 +403,7 @@ class ChatController extends Controller
         $echoes = cache()->remember(
             'user-echoes'.$user->id,
             3600,
-            fn () => UserEcho::with(['room', 'target', 'bot'])->where('user_id', '=', $user->id)->get(),
+            fn () => UserEcho::with(['user', 'room', 'target', 'bot'])->where('user_id', '=', $user->id)->get(),
         );
 
         if ($echoes->doesntContain(fn ($echo) => $echo->room_id == $room->id)) {

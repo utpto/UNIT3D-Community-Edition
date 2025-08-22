@@ -304,7 +304,7 @@ class NerdBot
             $echoes = cache()->remember(
                 'user-echoes'.$target->id,
                 3600,
-                fn () => UserEcho::with(['room', 'target', 'bot'])->where('user_id', '=', $target->id)->get()
+                fn () => UserEcho::with(['user', 'room', 'target', 'bot'])->where('user_id', '=', $target->id)->get()
             );
 
             if ($echoes->doesntContain(fn ($echo) => $echo->bot_id == $this->bot->id)) {
@@ -322,7 +322,7 @@ class NerdBot
             $audibles = cache()->remember(
                 'user-audibles'.$target->id,
                 3600,
-                fn () => UserAudible::with(['room', 'target', 'bot'])->where('user_id', '=', $target->id)->get()
+                fn () => UserAudible::with(['user', 'room', 'target', 'bot'])->where('user_id', '=', $target->id)->get()
             );
 
             if ($audibles->doesntContain(fn ($audible) => $audible->bot_id == $this->bot->id)) {
