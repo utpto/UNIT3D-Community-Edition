@@ -237,21 +237,13 @@ class NerdBot
         $this->target = $user;
 
         if ($type === 'message') {
-            $x = 0;
+            [$command,] = mb_split(' +', trim($message), 2) + [null, null];
         } else {
-            $x = 1;
+            [, $command,] = mb_split(' +', trim($message), 3) + [null, null, null];
         }
 
-        if ($message === '') {
-            $log = '';
-        } else {
-            $log = 'All '.$this->bot->name.' commands must be a private message or begin with /'.$this->bot->command.' or !'.$this->bot->command.'. Need help? Type /'.$this->bot->command.' help and you shall be helped.';
-        }
-
-        $command = @explode(' ', $message);
-
-        if (\array_key_exists($x, $command)) {
-            $log = match($command[$x]) {
+        if ($command !== null && $message !== '') {
+            $log = match($command) {
                 'banker'        => $this->getBanker(),
                 'bans'          => $this->getBans(),
                 'unbans'        => $this->getUnbans(),
@@ -267,7 +259,7 @@ class NerdBot
                 'seeded'        => $this->getSeeded(),
                 'leeched'       => $this->getLeeched(),
                 'snatched'      => $this->getSnatched(),
-                default         => '',
+                default         => 'All '.$this->bot->name.' commands must be a private message or begin with /'.$this->bot->command.' or !'.$this->bot->command.'. Need help? Type /'.$this->bot->command.' help and you shall be helped.',
             };
         }
 
