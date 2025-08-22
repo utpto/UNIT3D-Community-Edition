@@ -126,16 +126,45 @@ class ChatController extends Controller
     /* MESSAGES */
     public function botMessages(Request $request, int $botId): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $runbot = null;
         $bot = Bot::findOrFail($botId);
+        $user = $request->user();
 
-        if ($bot->is_systembot) {
-            $runbot = new SystemBot($this->chatRepository);
-        } elseif ($bot->is_nerdbot) {
-            $runbot = new NerdBot($this->chatRepository);
+        // Create echo for user if missing
+        $echoes = cache()->remember(
+            'user-echoes'.$user->id,
+            3600,
+            fn () => UserEcho::with(['user', 'room', 'target', 'bot'])->where('user_id', '=', $user->id)->get()
+        );
+
+        if ($echoes->doesntContain(fn ($echo) => $echo->bot_id == $bot->id)) {
+            $echoes->push(UserEcho::create([
+                'user_id' => $user->id,
+                'bot_id'  => $bot->id,
+            ]));
+
+            cache()->put('user-echoes'.$user->id, $echoes, 3600);
+
+            Chatter::dispatch('echo', $user->id, UserEchoResource::collection($echoes));
         }
 
-        $runbot->process('message', $request->user(), '');
+        // Create audible for user if missing
+        $audibles = cache()->remember(
+            'user-audibles'.$user->id,
+            3600,
+            fn () => UserAudible::with(['user', 'room', 'target', 'bot'])->where('user_id', '=', $user->id)->get()
+        );
+
+        if ($audibles->doesntContain(fn ($audible) => $audible->bot_id == $bot->id)) {
+            $audibles->push(UserAudible::create([
+                'user_id' => $user->id,
+                'bot_id'  => $bot->id,
+                'status'  => 0,
+            ]));
+
+            cache()->put('user-audibles'.$user->id, $audibles, 3600);
+
+            Chatter::dispatch('audible', $user->id, UserAudibleResource::collection($audibles));
+        }
 
         return ChatMessageResource::collection($this->chatRepository->botMessages($request->user()->id, $bot->id));
     }

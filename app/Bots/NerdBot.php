@@ -232,7 +232,7 @@ class NerdBot
     /**
      * Process Message.
      */
-    public function process(string $type, User $user, string $message = ''): true|\Illuminate\Http\Response
+    public function process(string $type, User $user, string $message): true|\Illuminate\Http\Response
     {
         $this->target = $user;
 
@@ -242,30 +242,27 @@ class NerdBot
             [, $command,] = mb_split(' +', trim($message), 3) + [null, null, null];
         }
 
-        if ($command !== null && $message !== '') {
-            $log = match($command) {
-                'banker'        => $this->getBanker(),
-                'bans'          => $this->getBans(),
-                'unbans'        => $this->getUnbans(),
-                'doubleupload'  => $this->getDoubleUpload(),
-                'freeleech'     => $this->getFreeleech(),
-                'help'          => $this->getHelp(),
-                'king'          => $this->getKing(),
-                'logins'        => $this->getLogins(),
-                'peers'         => $this->getPeers(),
-                'registrations' => $this->getRegistrations(),
-                'uploads'       => $this->getUploads(),
-                'warnings'      => $this->getWarnings(),
-                'seeded'        => $this->getSeeded(),
-                'leeched'       => $this->getLeeched(),
-                'snatched'      => $this->getSnatched(),
-                default         => 'All '.$this->bot->name.' commands must be a private message or begin with /'.$this->bot->command.' or !'.$this->bot->command.'. Need help? Type /'.$this->bot->command.' help and you shall be helped.',
-            };
-        }
+        $this->log = match($command) {
+            'banker'        => $this->getBanker(),
+            'bans'          => $this->getBans(),
+            'unbans'        => $this->getUnbans(),
+            'doubleupload'  => $this->getDoubleUpload(),
+            'freeleech'     => $this->getFreeleech(),
+            'help'          => $this->getHelp(),
+            'king'          => $this->getKing(),
+            'logins'        => $this->getLogins(),
+            'peers'         => $this->getPeers(),
+            'registrations' => $this->getRegistrations(),
+            'uploads'       => $this->getUploads(),
+            'warnings'      => $this->getWarnings(),
+            'seeded'        => $this->getSeeded(),
+            'leeched'       => $this->getLeeched(),
+            'snatched'      => $this->getSnatched(),
+            default         => 'All '.$this->bot->name.' commands must be a private message or begin with /'.$this->bot->command.' or !'.$this->bot->command.'. Need help? Type /'.$this->bot->command.' help and you shall be helped.',
+        };
 
         $this->type = $type;
         $this->message = $message;
-        $this->log = $log;
 
         return $this->pm();
     }
@@ -319,29 +316,23 @@ class NerdBot
             }
 
             // Create message
-            if ($txt !== '') {
-                $roomId = 0;
-                $this->chatRepository->privateMessage($target->id, $roomId, $message, 1, $this->bot->id);
-                $this->chatRepository->privateMessage(1, $roomId, $txt, $target->id, $this->bot->id);
-            }
+            $roomId = 0;
+            $this->chatRepository->privateMessage($target->id, $roomId, $message, 1, $this->bot->id);
+            $this->chatRepository->privateMessage(1, $roomId, $txt, $target->id, $this->bot->id);
 
             return response('success');
         }
 
         if ($type === 'echo') {
-            if ($txt !== '') {
-                $roomId = 0;
-                $this->chatRepository->botMessage($this->bot->id, $roomId, $txt, $target->id);
-            }
+            $roomId = 0;
+            $this->chatRepository->botMessage($this->bot->id, $roomId, $txt, $target->id);
 
             return response('success');
         }
 
         if ($type === 'public') {
-            if ($txt !== '') {
-                $this->chatRepository->message($target->id, $target->chatroom->id, $message, null, null);
-                $this->chatRepository->message(1, $target->chatroom->id, $txt, null, $this->bot->id);
-            }
+            $this->chatRepository->message($target->id, $target->chatroom->id, $message, null, null);
+            $this->chatRepository->message(1, $target->chatroom->id, $txt, null, $this->bot->id);
 
             return response('success');
         }
