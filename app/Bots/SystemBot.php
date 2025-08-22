@@ -126,38 +126,29 @@ class SystemBot
     {
         $this->target = $user;
 
-        if ($type === 'message') {
-            $x = 0;
-            $y = 1;
-            $z = 2;
-        } else {
-            $x = 1;
-            $y = 2;
-            $z = 3;
+        if ($type !== 'message') {
+            $message = trim(strstr($message, ' ') ?: '');
         }
 
-        $log = 'All '.$this->bot->name.' commands must be a private message or begin with /'.$this->bot->command.' or !'.$this->bot->command.'. Need help? Type /'.$this->bot->command.' help and you shall be helped.';
+        $firstWord = strstr($message, ' ', true);
 
-        $command = @explode(' ', $message);
+        switch ($firstWord) {
+            case 'gift':
+                [, $username, $amount, $message] = mb_split(' +', $message, 4) + [null, null, null, null];
 
-        if (\array_key_exists($x, $command)) {
-            if ($command[$x] === 'gift' && \array_key_exists($y, $command) && \array_key_exists($z, $command) && \array_key_exists($z + 1, $command)) {
-                $clone = $command;
-                array_shift($clone);
-                array_shift($clone);
-                array_shift($clone);
-                array_shift($clone);
-                $log = $this->putGift($command[$y], (float) $command[$z], $clone);
-            }
+                $this->log = $this->putGift($username, $amount, $message);
 
-            if ($command[$x] === 'help') {
-                $log = $this->getHelp();
-            }
+                break;
+            case 'help':
+                $this->log = $this->getHelp();
+
+                break;
+            default:
+                $this->log = 'All '.$this->bot->name.' commands must be a private message or begin with /'.$this->bot->command.' or !'.$this->bot->command.'. Need help? Type /'.$this->bot->command.' help and you shall be helped.';
         }
 
         $this->type = $type;
         $this->message = $message;
-        $this->log = $log;
 
         return $this->pm();
     }
