@@ -238,10 +238,8 @@ class NerdBot
 
         if ($type === 'message') {
             $x = 0;
-            $y = 1;
         } else {
             $x = 1;
-            $y = 2;
         }
 
         if ($message === '') {
@@ -251,15 +249,6 @@ class NerdBot
         }
 
         $command = @explode(' ', $message);
-
-        $params = $command[$y] ?? null;
-
-        if ($params) {
-            $clone = $command;
-            array_shift($clone);
-            array_shift($clone);
-            array_shift($clone);
-        }
 
         if (\array_key_exists($x, $command)) {
             $log = match($command[$x]) {
