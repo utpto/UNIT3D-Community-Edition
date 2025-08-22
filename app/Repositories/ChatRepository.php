@@ -21,7 +21,6 @@ use App\Events\MessageSent;
 use App\Http\Resources\ChatMessageResource;
 use App\Models\Bot;
 use App\Models\Chatroom;
-use App\Models\ChatStatus;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -246,21 +245,6 @@ class ChatRepository
         }
 
         return $room;
-    }
-
-    public function status(int|User $user): ?ChatStatus
-    {
-        $status = null;
-
-        if ($user instanceof User) {
-            $status = ChatStatus::query()->where('user_id', '=', $user->id)->first();
-        }
-
-        if (\is_int($user)) {
-            $status = ChatStatus::query()->where('user_id', '=', $user)->first();
-        }
-
-        return $status;
     }
 
     protected function censorMessage(string $message): string
