@@ -21,7 +21,7 @@ use App\Http\Resources\TorrentRequestResource;
 use App\Models\TorrentRequest;
 use Illuminate\Http\Request;
 
-class RequestController extends Controller
+class TorrentRequestController extends Controller
 {
     /**
      * Request search filter.
