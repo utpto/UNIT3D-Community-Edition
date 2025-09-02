@@ -54,7 +54,7 @@
                         class="form__text"
                         name="color"
                         required
-                        type="color"
+                        type="text"
                         value="#FFDC00"
                     />
                     <label class="form__label form__label--floating" for="color">
@@ -67,7 +67,7 @@
                         class="form__text"
                         name="icon"
                         type="text"
-                        placeholder="fas fa-circle"
+                        placeholder="fa-circle"
                     />
                     <label class="form__label form__label--floating" for="icon">
                         {{ __('common.icon') }}
