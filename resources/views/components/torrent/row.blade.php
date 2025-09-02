@@ -211,19 +211,45 @@
     <td class="torrent-search--list__size">
         <span>{{ $torrent->getSize() }}</span>
     </td>
-    <td class="torrent-search--list__seeders">
+    <td
+        @class([
+            'torrent-search--list__seeders',
+            'torrent-activity-indicator--seeding' => $torrent->seeding,
+        ])
+        @if ($torrent->seeding)
+            title="{{ __('torrent.currently-seeding') }}"
+        @endif
+    >
         <a href="{{ route('peers', ['id' => $torrent->id]) }}">
             <span>{{ $torrent->seeds_count ?? $torrent->seeders }}</span>
         </a>
     </td>
-    <td class="torrent-search--list__leechers">
+    <td
+        @class([
+            'torrent-search--list__leechers',
+            'torrent-activity-indicator--leeching' => $torrent->leeching,
+        ])
+        @if ($torrent->leeching)
+            title="{{ __('torrent.currently-leeching') }}"
+        @endif
+    >
         <a href="{{ route('peers', ['id' => $torrent->id]) }}">
             <span>{{ $torrent->leeches_count ?? $torrent->leechers }}</span>
         </a>
     </td>
-    <td class="torrent-search--list__completed">
+    <td
+        @class([
+            'torrent-search--list__completed',
+            'torrent-activity-indicator--completed' => $torrent->completed,
+        ])
+        @if ($torrent->completed)
+            title="{{ __('torrent.completed') }}"
+        @endif
+    >
         <a href="{{ route('history', ['id' => $torrent->id]) }}">
-            <span>{{ $torrent->times_completed }}</span>
+            <span>
+                {{ $torrent->times_completed }}
+            </span>
         </a>
     </td>
     <td class="torrent-search--list__age">
