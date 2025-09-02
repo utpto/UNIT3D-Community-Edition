@@ -30,9 +30,8 @@ return new class () extends Migration {
             $table->string('icon')->after('color');
         });
 
-        DB::table('ticket_priorities')->update([
-            'color' => '#aaaaaa',
-            'icon'  => 'fas fa-circle',
-        ]);
+        DB::table('ticket_priorities')->where('name', '=', 'Low')->update(['color' => '#FFDC00', 'icon' => config('other.font-awesome').' fa-circle']);
+        DB::table('ticket_priorities')->where('name', '=', 'Medium')->update(['color' => '#FF851B', 'icon' => config('other.font-awesome').' fa-circle']);
+        DB::table('ticket_priorities')->where('name', '=', 'High')->update(['color' => '#FF4136', 'icon' => config('other.font-awesome').' fa-circle']);
     }
 };
