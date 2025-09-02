@@ -35,4 +35,11 @@ class TicketPriority extends Model
 
     /** @use HasFactory<\Database\Factories\TicketPriorityFactory> */
     use HasFactory;
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var string[]
+     */
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 }
