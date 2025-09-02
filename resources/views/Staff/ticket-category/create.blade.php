@@ -40,7 +40,7 @@
                         class="form__text"
                         inputmode="numeric"
                         name="position"
-                        pattern="[0-9]*"
+                        pattern="[0-9]+"
                         required
                         type="text"
                     />

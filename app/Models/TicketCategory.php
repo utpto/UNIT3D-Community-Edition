@@ -41,5 +41,5 @@ class TicketCategory extends Model
      *
      * @var string[]
      */
-    protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $guarded = [];
 }

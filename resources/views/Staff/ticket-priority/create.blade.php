@@ -40,12 +40,37 @@
                         class="form__text"
                         inputmode="numeric"
                         name="position"
-                        pattern="[0-9]*"
+                        pattern="[0-9]+"
                         required
                         type="text"
                     />
                     <label class="form__label form__label--floating" for="position">
                         {{ __('common.position') }}
+                    </label>
+                </p>
+                <p class="form__group">
+                    <input
+                        id="color"
+                        class="form__text"
+                        name="color"
+                        required
+                        type="color"
+                        value="#FFDC00"
+                    />
+                    <label class="form__label form__label--floating" for="color">
+                        {{ __('common.color') }}
+                    </label>
+                </p>
+                <p class="form__group">
+                    <input
+                        id="icon"
+                        class="form__text"
+                        name="icon"
+                        type="text"
+                        placeholder="fas fa-circle"
+                    />
+                    <label class="form__label form__label--floating" for="icon">
+                        {{ __('common.icon') }}
                     </label>
                 </p>
                 <p class="form__group">

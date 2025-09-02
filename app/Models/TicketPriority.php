@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int                             $id
  * @property string                          $name
  * @property int                             $position
+ * @property string                          $color
+ * @property string                          $icon
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
@@ -41,5 +43,5 @@ class TicketPriority extends Model
      *
      * @var string[]
      */
-    protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $guarded = [];
 }

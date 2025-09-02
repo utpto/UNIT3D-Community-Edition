@@ -41,6 +41,16 @@ class UpdateTicketPriorityRequest extends FormRequest
             ],
             'position' => [
                 'required',
+                'decimal:0',
+                'min:0',
+            ],
+            'color' => [
+                'required',
+                'string',
+            ],
+            'icon' => [
+                'required',
+                'string',
             ],
         ];
     }

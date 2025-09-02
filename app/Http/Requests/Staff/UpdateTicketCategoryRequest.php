@@ -41,6 +41,8 @@ class UpdateTicketCategoryRequest extends FormRequest
             ],
             'position' => [
                 'required',
+                'decimal:0',
+                'min:0',
             ],
         ];
     }
