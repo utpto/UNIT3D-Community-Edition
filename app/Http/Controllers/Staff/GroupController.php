@@ -21,7 +21,6 @@ use App\Http\Requests\Staff\StoreGroupRequest;
 use App\Http\Requests\Staff\UpdateGroupRequest;
 use App\Models\ForumCategory;
 use App\Models\Group;
-use App\Models\User;
 use App\Services\Unit3dAnnounce;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
@@ -115,32 +114,27 @@ class GroupController extends Controller
         }
 
         if ($group->users()->exists()) {
-            $defaultGroup = Group::query()
-                ->where('system_required', '=', true)
-                ->firstWhere('name', '=', 'User');
+            $userIds = $group->users()->pluck('id')->toArray();
 
-            if (!$defaultGroup) {
+            $defaultGroup = Group::query()
+                ->where('system_required', true)
+                ->where('name', '=', 'User')
+                ->first();
+
+            if ($defaultGroup === null) {
                 return to_route('staff.groups.index')
                     ->with('error', 'Cannot find default User group to reassign users.');
             }
 
-            // Get user count before reassignment
-            $userCount = $group->users()->count();
-
-            // Move all users to the default User group using the relationship
             $group->users()->update(['group_id' => $defaultGroup->id]);
 
-            // Run auto:group command to reassign users to appropriate groups
-            Artisan::call('auto:group');
-
-            return to_route('staff.groups.index')
-                ->with('success', "Group \"{$group->name}\" was deleted successfully. {$userCount} users were moved to their appropriate groups.");
+            Artisan::call('auto:group', ['user_ids' => $userIds]);
         }
 
         Unit3dAnnounce::removeGroup($group);
         $group->delete();
 
         return to_route('staff.groups.index')
-            ->with('success', "Group \"{$group->name}\" was deleted successfully.");
+            ->with('success', "Group deleted successfully.");
     }
 }
