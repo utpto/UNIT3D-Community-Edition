@@ -56,7 +56,12 @@
             {{ $torrent->getSize() }}
         </span>
     </li>
-    <li class="torrent__seeders">
+    <li
+        @class([
+            'torrent__seeders',
+            'torrent-activity-indicator--seeding' => $torrent->seeding,
+        ])
+    >
         <a
             class="torrent__seeders-link text-green"
             href="{{ route('peers', ['id' => $torrent->id]) }}"
@@ -66,7 +71,12 @@
             {{ $torrent->seeds_count }}
         </a>
     </li>
-    <li class="torrent__leechers">
+    <li
+        @class([
+            'torrent__leechers',
+            'torrent-activity-indicator--leeching' => $torrent->leeching,
+        ])
+    >
         <a
             class="torrent__leechers-link text-red"
             href="{{ route('peers', ['id' => $torrent->id]) }}"
@@ -76,7 +86,12 @@
             {{ $torrent->leeches_count }}
         </a>
     </li>
-    <li class="torrent__completed">
+    <li
+        @class([
+            'torrent__completed',
+            'torrent-activity-indicator--completed' => $torrent->completed,
+        ])
+    >
         <a
             class="torrent__completed-link text-info"
             href="{{ route('history', ['id' => $torrent->id]) }}"

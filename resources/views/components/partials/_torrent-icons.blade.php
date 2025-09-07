@@ -1,32 +1,4 @@
 <span class="torrent-icons">
-    @if ($torrent->seeding)
-        <i
-            class="{{ config('other.font-awesome') }} fa-arrow-circle-up text-success torrent-icons"
-            title="{{ __('torrent.currently-seeding') }}"
-        ></i>
-    @endif
-
-    @if ($torrent->leeching)
-        <i
-            class="{{ config('other.font-awesome') }} fa-arrow-circle-down text-danger torrent-icons"
-            title="{{ __('torrent.currently-leeching') }}"
-        ></i>
-    @endif
-
-    @if ($torrent->not_completed)
-        <i
-            class="{{ config('other.font-awesome') }} fa-do-not-enter text-info torrent-icons"
-            title="{{ __('torrent.not-completed') }}"
-        ></i>
-    @endif
-
-    @if ($torrent->not_seeding)
-        <i
-            class="{{ config('other.font-awesome') }} fa-thumbs-down text-warning torrent-icons"
-            title="{{ __('torrent.completed-not-seeding') }}"
-        ></i>
-    @endif
-
     @isset($torrent->comments_count)
         <a href="{{ route('torrents.show', ['id' => $torrent->id]) }}#comments">
             <i

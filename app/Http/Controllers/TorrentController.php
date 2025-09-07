@@ -95,7 +95,16 @@ class TorrentController extends Controller
                 'featured as featured',
                 'bookmarks'       => fn ($query) => $query->where('user_id', '=', $user->id),
                 'freeleechTokens' => fn ($query) => $query->where('user_id', '=', $user->id),
-                'trump'
+                'trump',
+                'history as seeding' => fn ($query) => $query->where('user_id', '=', $user->id)
+                    ->where('active', '=', 1)
+                    ->where('seeder', '=', 1),
+                'history as leeching' => fn ($query) => $query->where('user_id', '=', $user->id)
+                    ->where('active', '=', 1)
+                    ->where('seeder', '=', 0),
+                'history as completed' => fn ($query) => $query->where('user_id', '=', $user->id)
+                    ->where('active', '=', 0)
+                    ->where('seeder', '=', 1),
             ])
             ->findOrFail($id);
 
