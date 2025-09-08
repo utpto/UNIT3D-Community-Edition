@@ -88,21 +88,45 @@
                         <td class="user-bookmarks__size">
                             {{ App\Helpers\StringHelper::formatBytes($bookmark->size) }}
                         </td>
-                        <td class="user-bookmarks__seeders">
+                        <td
+                            @class([
+                                'user-bookmarks__seeders',
+                                'torrent-activity-indicator--seeding' => $bookmark->seeding,
+                            ])
+                            @if ($bookmark->seeding)
+                                title="{{ __('torrent.currently-seeding') }}"
+                            @endif
+                        >
                             <a href="{{ route('peers', ['id' => $bookmark->torrent_id]) }}">
                                 <span class="text-green">
                                     {{ $bookmark->seeders }}
                                 </span>
                             </a>
                         </td>
-                        <td class="user-bookmarks__leechers">
+                        <td
+                            @class([
+                                'user-bookmarks__leechers',
+                                'torrent-activity-indicator--leeching' => $bookmark->leeching,
+                            ])
+                            @if ($bookmark->leeching)
+                                title="{{ __('torrent.currently-leeching') }}"
+                            @endif
+                        >
                             <a href="{{ route('peers', ['id' => $bookmark->torrent_id]) }}">
                                 <span class="text-red">
                                     {{ $bookmark->leechers }}
                                 </span>
                             </a>
                         </td>
-                        <td class="user-bookmarks__times_completed">
+                        <td
+                            @class([
+                                'user-bookmarks__times_completed',
+                                'torrent-activity-indicator--completed' => $bookmark->completed,
+                            ])
+                            @if ($bookmark->completed)
+                                title="{{ __('torrent.completed') }}"
+                            @endif
+                        >
                             <a href="{{ route('history', ['id' => $bookmark->torrent_id]) }}">
                                 <span class="text-orange">
                                     {{ $bookmark->times_completed }}

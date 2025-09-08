@@ -240,21 +240,45 @@
                             <td class="user-uploads__size">
                                 {{ App\Helpers\StringHelper::formatBytes($torrent->size) }}
                             </td>
-                            <td class="user-uploads__seeders">
+                            <td
+                                @class([
+                                    'user-uploads__seeders',
+                                    'torrent-activity-indicator--seeding' => $torrent->seeding,
+                                ])
+                                @if ($torrent->seeding)
+                                    title="{{ __('torrent.currently-seeding') }}"
+                                @endif
+                            >
                                 <a href="{{ route('peers', ['id' => $torrent->id]) }}">
                                     <span class="text-green">
                                         {{ $torrent->seeders }}
                                     </span>
                                 </a>
                             </td>
-                            <td class="user-uploads__leechers">
+                            <td
+                                @class([
+                                    'user-uploads__leechers',
+                                    'torrent-activity-indicator--leeching' => $torrent->leeching,
+                                ])
+                                @if ($torrent->leeching)
+                                    title="{{ __('torrent.currently-leeching') }}"
+                                @endif
+                            >
                                 <a href="{{ route('peers', ['id' => $torrent->id]) }}">
                                     <span class="text-red">
                                         {{ $torrent->leechers }}
                                     </span>
                                 </a>
                             </td>
-                            <td class="user-uploads__times">
+                            <td
+                                @class([
+                                    'user-uploads__times',
+                                    'torrent-activity-indicator--completed' => $torrent->completed,
+                                ])
+                                @if ($torrent->completed)
+                                    title="{{ __('torrent.completed') }}"
+                                @endif
+                            >
                                 <a href="{{ route('history', ['id' => $torrent->id]) }}">
                                     <span class="text-orange">
                                         {{ $torrent->times_completed }}
