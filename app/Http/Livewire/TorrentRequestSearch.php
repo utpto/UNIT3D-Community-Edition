@@ -168,7 +168,7 @@ class TorrentRequestSearch extends Component
     }
 
     /**
-     * @var \Illuminate\Support\Collection<int, TmdbMovie>
+     * @var \Illuminate\Support\Collection<int, string>
      */
     final protected \Illuminate\Support\Collection $primaryLanguages {
         get => cache()->remember(
