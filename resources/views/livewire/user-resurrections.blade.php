@@ -128,7 +128,15 @@
                             <td class="user-resurrections__size">
                                 {{ App\Helpers\StringHelper::formatBytes($resurrection->torrent->size) }}
                             </td>
-                            <td class="user-resurrections__seeders">
+                            <td
+                                @class([
+                                    'user-resurrections__seeders',
+                                    'torrent-activity-indicator--seeding' => $resurrection->seeding,
+                                ])
+                                @if ($resurrection->seeding)
+                                    title="{{ __('torrent.currently-seeding') }}"
+                                @endif
+                            >
                                 <a
                                     href="{{ route('peers', ['id' => $resurrection->torrent->id]) }}"
                                 >
@@ -137,7 +145,15 @@
                                     </span>
                                 </a>
                             </td>
-                            <td class="user-resurrections__leechers">
+                            <td
+                                @class([
+                                    'user-resurrections__leechers',
+                                    'torrent-activity-indicator--leeching' => $resurrection->leeching,
+                                ])
+                                @if ($resurrection->leeching)
+                                    title="{{ __('torrent.currently-leeching') }}"
+                                @endif
+                            >
                                 <a
                                     href="{{ route('peers', ['id' => $resurrection->torrent->id]) }}"
                                 >
@@ -146,7 +162,15 @@
                                     </span>
                                 </a>
                             </td>
-                            <td class="user-resurrections__times_completed">
+                            <td
+                                @class([
+                                    'user-resurrections__times_completed',
+                                    'torrent-activity-indicator--completed' => $resurrection->completed,
+                                ])
+                                @if ($resurrection->completed)
+                                    title="{{ __('torrent.completed') }}"
+                                @endif
+                            >
                                 <a
                                     href="{{ route('history', ['id' => $resurrection->torrent->id]) }}"
                                 >
