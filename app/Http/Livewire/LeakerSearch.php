@@ -61,6 +61,7 @@ class LeakerSearch extends Component
             ])
             ->with([
                 'user' => [
+                    'group',
                     'history' => fn ($query) => $query->select(['user_id', 'agent'])->distinct()->orderBy('agent'),
                     'peers'   => fn ($query) => $query->select(['user_id', 'ip'])->distinct()->orderBy('ip'),
                 ],
