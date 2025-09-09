@@ -63,7 +63,7 @@
         ])
     >
         <a
-            class="torrent__seeders-link text-green"
+            class="torrent__seeders-link torrent__seeder-count"
             href="{{ route('peers', ['id' => $torrent->id]) }}"
             title="{{ $torrent->seeds_count }} {{ __('torrent.seeders') }}"
         >
@@ -78,7 +78,7 @@
         ])
     >
         <a
-            class="torrent__leechers-link text-red"
+            class="torrent__leechers-link torrent__leecher-count"
             href="{{ route('peers', ['id' => $torrent->id]) }}"
             title="{{ $torrent->leeches_count }} {{ __('torrent.leechers') }}"
         >
@@ -93,7 +93,7 @@
         ])
     >
         <a
-            class="torrent__completed-link text-info"
+            class="torrent__completed-link torrent__times-completed-count"
             href="{{ route('history', ['id' => $torrent->id]) }}"
             title="{{ $torrent->times_completed }} {{ __('torrent.times') }}"
         >
