@@ -429,10 +429,11 @@
                                     title="{{ __('torrent.currently-seeding') }}"
                                 @endif
                             >
-                                <a href="{{ route('peers', ['id' => $history->torrent_id]) }}">
-                                    <span class="text-green">
-                                        {{ $history->seeders }}
-                                    </span>
+                                <a
+                                    class="torrent__seeder-count"
+                                    href="{{ route('peers', ['id' => $history->torrent_id]) }}"
+                                >
+                                    {{ $history->seeders }}
                                 </a>
                             </td>
                             <td
@@ -444,10 +445,11 @@
                                     title="{{ __('torrent.currently-leeching') }}"
                                 @endif
                             >
-                                <a href="{{ route('peers', ['id' => $history->torrent_id]) }}">
-                                    <span class="text-red">
-                                        {{ $history->leechers }}
-                                    </span>
+                                <a
+                                    class="torrent__leecher-count"
+                                    href="{{ route('peers', ['id' => $history->torrent_id]) }}"
+                                >
+                                    {{ $history->leechers }}
                                 </a>
                             </td>
                             <td
@@ -459,10 +461,11 @@
                                     title="{{ __('torrent.completed') }}"
                                 @endif
                             >
-                                <a href="{{ route('history', ['id' => $history->torrent_id]) }}">
-                                    <span class="text-orange">
-                                        {{ $history->times_completed }}
-                                    </span>
+                                <a
+                                    class="torrent__times-completed-count"
+                                    href="{{ route('history', ['id' => $history->torrent_id]) }}"
+                                >
+                                    {{ $history->times_completed }}
                                 </a>
                             </td>
                             <td class="user-torrents__agent text-purple">
