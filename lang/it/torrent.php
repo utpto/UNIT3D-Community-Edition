@@ -238,4 +238,5 @@ return [
     'subtitle-included' => 'Questo torrent include già i seguenti sottotitoli mixati:',
     'torrents-matched' => 'Torrent abbinati',
     'year-range' => 'Intervallo di anni',
+    'reseed-requests' => 'Richiesta di condivisione',
 ];
