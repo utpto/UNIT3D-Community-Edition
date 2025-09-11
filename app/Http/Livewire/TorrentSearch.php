@@ -520,7 +520,7 @@ class TorrentSearch extends Component
             }
 
             // See app/Traits/TorrentMeta.php
-            $this->scopeMeta($torrents);
+            $this->scopeMeta($torrents, withCredits: true);
 
             return $torrents;
         }
