@@ -73,22 +73,25 @@
         >
             Posters
         </li>
-        <li
-            class="panel__tab"
-            role="tab"
-            x-bind:class="tab === 'thanked' && 'panel__tab--active'"
-            x-on:click="tab = 'thanked'"
-        >
-            Thanked
-        </li>
-        <li
-            class="panel__tab"
-            role="tab"
-            x-bind:class="tab === 'thankers' && 'panel__tab--active'"
-            x-on:click="tab = 'thankers'"
-        >
-            Thankers
-        </li>
+        @if (config('other.thanks-system.is-enabled'))
+            <li
+                class="panel__tab"
+                role="tab"
+                x-bind:class="tab === 'thanked' && 'panel__tab--active'"
+                x-on:click="tab = 'thanked'"
+            >
+                Thanked
+            </li>
+            <li
+                class="panel__tab"
+                role="tab"
+                x-bind:class="tab === 'thankers' && 'panel__tab--active'"
+                x-on:click="tab = 'thankers'"
+            >
+                Thankers
+            </li>
+        @endif
+
         <li
             class="panel__tab"
             role="tab"
