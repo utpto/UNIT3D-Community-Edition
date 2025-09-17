@@ -550,6 +550,19 @@
                                 Automatically unbookmark torrents upon completion
                             </label>
                         </p>
+                        <p class="form__group">
+                            <label class="form__label">
+                                <input type="hidden" name="show_adult_content" value="0" />
+                                <input
+                                    class="form__checkbox"
+                                    type="checkbox"
+                                    name="show_adult_content"
+                                    value="1"
+                                    @checked($user->settings->show_adult_content)
+                                />
+                                {{ __('user.show-adult-content') }}
+                            </label>
+                        </p>
                     </div>
                 </fieldset>
                 <p class="form__group">
