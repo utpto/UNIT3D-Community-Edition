@@ -186,6 +186,26 @@ class TopUsers extends Component
     }
 
     /**
+     * @var \Illuminate\Support\Collection<int, Torrent>
+     */
+    final protected \Illuminate\Support\Collection $thanked {
+        get => cache()->flexible(
+            'top-users:thanked',
+            [3600, 3600 * 2],
+            fn () => Torrent::query()
+                ->join('thanks', 'thanks.torrent_id', '=', 'torrents.id')
+                ->with(['user.group'])
+                ->select(DB::raw('torrents.user_id, COUNT(*) as value'))
+                ->where('torrents.user_id', '!=', User::SYSTEM_USER_ID)
+                ->where('anon', '=', false)
+                ->groupBy('torrents.user_id')
+                ->orderByDesc('value')
+                ->take(8)
+                ->get(),
+        );
+    }
+
+    /**
      * @var \Illuminate\Support\Collection<int, Thank>
      */
     final protected \Illuminate\Support\Collection $thankers {
