@@ -19,8 +19,6 @@ namespace App\Models;
 use App\Enums\ModerationStatus;
 use App\Helpers\StringHelper;
 use App\Models\Scopes\ApprovedScope;
-use App\Notifications\NewComment;
-use App\Notifications\NewThank;
 use App\Traits\Auditable;
 use App\Traits\GroupedLastScope;
 use Illuminate\Database\Eloquent\Builder;
@@ -800,31 +798,6 @@ class Torrent extends Model
         $bytes = $this->size;
 
         return StringHelper::formatBytes($bytes, 2);
-    }
-
-    /**
-     * Notify Uploader When An Action Is Taken.
-     */
-    public function notifyUploader(string $type, Thank|Comment $payload): bool
-    {
-        $user = User::with('notification')->findOrFail($this->user_id);
-
-        switch (true) {
-            case $payload instanceof Thank:
-                if ($user->acceptsNotification(auth()->user(), $user, 'torrent', 'show_torrent_thank')) {
-                    $user->notify(new NewThank('torrent', $payload));
-                }
-
-                break;
-            case $payload instanceof Comment:
-                if ($user->acceptsNotification(auth()->user(), $user, 'torrent', 'show_torrent_comment')) {
-                    $user->notify(new NewComment($this, $payload));
-                }
-
-                break;
-        }
-
-        return true;
     }
 
     /**

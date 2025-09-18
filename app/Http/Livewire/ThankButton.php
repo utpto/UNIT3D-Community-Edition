@@ -19,6 +19,7 @@ namespace App\Http\Livewire;
 use App\Models\Thank;
 use App\Models\Torrent;
 use App\Models\User;
+use App\Notifications\NewThank;
 use Livewire\Component;
 
 class ThankButton extends Component
@@ -51,7 +52,11 @@ class ThankButton extends Component
             'torrent_id' => $this->torrent->id,
         ]);
 
-        $this->torrent->notifyUploader('thank', $thank);
+        $uploader = $this->torrent->user;
+
+        if ($uploader->acceptsNotification($this->user, $uploader, 'torrent', 'show_torrent_thank')) {
+            $uploader->notify(new NewThank('torrent', $thank));
+        }
 
         $this->dispatch('success', type: 'success', message: 'Your Thank Was Successfully Applied!');
     }
