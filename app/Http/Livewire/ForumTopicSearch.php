@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace App\Http\Livewire;
 
 use App\Models\Forum;
+use App\Models\ForumPermission;
 use App\Models\Subscription;
 use App\Models\Topic;
 use Livewire\Attributes\Url;
@@ -54,11 +55,17 @@ class ForumTopicSearch extends Component
 
     public ?Subscription $subscription;
 
+    public ?ForumPermission $permission;
+
     final public function mount(Forum $forum): void
     {
         $this->forum = $forum;
         $this->subscription = Subscription::where('user_id', '=', auth()->id())->where('forum_id', '=', $forum->id)->first();
         $this->state = $this->forum->default_topic_state_filter ?: '';
+        $this->permission = ForumPermission::query()
+            ->where('group_id', '=', auth()->user()->group_id)
+            ->where('forum_id', '=', $this->forum->id)
+            ->first();
     }
 
     final public function updatingSearch(): void
