@@ -196,16 +196,4 @@ class Topic extends Model
             )
             ->when($canReplyTopic && !auth()->user()->group->is_modo, fn ($query) => $query->where('state', '=', 'open'));
     }
-
-    /**
-     * Does User Have Permission To View Topic.
-     */
-    public function viewable(): bool
-    {
-        if (auth()->user()->group->is_modo) {
-            return true;
-        }
-
-        return $this->forum->getPermission()?->read_topic ?? false;
-    }
 }
