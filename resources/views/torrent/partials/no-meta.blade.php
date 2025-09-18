@@ -39,12 +39,12 @@
             <li class="meta__imdb">
                 <a
                     class="meta-id-tag"
-                    href="https://www.imdb.com/title/tt{{ \str_pad((int) $torrent->imdb, \max(\strlen((int) $torrent->imdb), 7), '0', STR_PAD_LEFT) }}"
+                    href="https://www.imdb.com/title/tt{{ \str_pad((int) $torrent->imdb, 7, '0', STR_PAD_LEFT) }}"
                     title="Internet Movie Database"
                     target="_blank"
                 >
                     IMDB:
-                    {{ \str_pad((int) $torrent->imdb, \max(\strlen((int) $torrent->imdb), 7), '0', STR_PAD_LEFT) }}
+                    {{ \str_pad((string) $torrent->imdb, 7, '0', STR_PAD_LEFT) }}
                 </a>
             </li>
         @endif
