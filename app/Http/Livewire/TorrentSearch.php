@@ -565,7 +565,12 @@ class TorrentSearch extends Component
                 ->orderBy($this->sortField, $this->sortDirection);
 
             $eagerLoads = fn (Builder $query) => $query
-                ->with(['type:id,name,position', 'resolution:id,name,position'])
+                ->with([
+                    'type:id,name,position',
+                    'resolution:id,name,position',
+                    'category:id,name,position',
+                    'user:id,username,group_id',
+                ])
                 ->select([
                     'id',
                     'name',
@@ -597,7 +602,6 @@ class TorrentSearch extends Component
                     WHEN category_id IN (SELECT id FROM categories WHERE tv_meta = 1) THEN 'tv'
                 END AS meta
             SQL)
-                ->with('user:id,username,group_id', 'category', 'type', 'resolution')
                 ->withCount([
                     'comments',
                 ])
