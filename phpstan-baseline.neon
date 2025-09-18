@@ -601,12 +601,6 @@ parameters:
 			path: app/Models/Rss.php
 
 		-
-			message: '#^Instanceof between App\\Models\\Comment and App\\Models\\Comment will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: app/Models/Torrent.php
-
-		-
 			message: '#^Strict comparison using \=\=\= between float\|null and 0 will always evaluate to false\.$#'
 			identifier: identical.alwaysFalse
 			count: 1
