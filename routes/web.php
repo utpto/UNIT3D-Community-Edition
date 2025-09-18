@@ -891,6 +891,7 @@ Route::middleware('language')->group(function (): void {
                 Route::post('/', [App\Http\Controllers\Staff\GroupController::class, 'store'])->name('store');
                 Route::get('/{group}/edit', [App\Http\Controllers\Staff\GroupController::class, 'edit'])->name('edit');
                 Route::patch('/{group}', [App\Http\Controllers\Staff\GroupController::class, 'update'])->name('update');
+                Route::delete('/{group}', [App\Http\Controllers\Staff\GroupController::class, 'destroy'])->name('destroy');
             });
 
             // Gifts Log
@@ -1041,6 +1042,26 @@ Route::middleware('language')->group(function (): void {
             // RSS Keys
             Route::prefix('rsskeys')->name('rsskeys.')->group(function (): void {
                 Route::get('/', [App\Http\Controllers\Staff\RsskeyController::class, 'index'])->name('index');
+            });
+
+            // Ticket Categories
+            Route::prefix('ticket-categories')->name('ticket_categories.')->group(function (): void {
+                Route::get('/', [App\Http\Controllers\Staff\TicketCategoryController::class, 'index'])->name('index');
+                Route::get('/create', [App\Http\Controllers\Staff\TicketCategoryController::class, 'create'])->name('create');
+                Route::post('/', [App\Http\Controllers\Staff\TicketCategoryController::class, 'store'])->name('store');
+                Route::get('/{ticketCategory}/edit', [App\Http\Controllers\Staff\TicketCategoryController::class, 'edit'])->name('edit');
+                Route::patch('/{ticketCategory}', [App\Http\Controllers\Staff\TicketCategoryController::class, 'update'])->name('update');
+                Route::delete('/{ticketCategory}', [App\Http\Controllers\Staff\TicketCategoryController::class, 'destroy'])->name('destroy');
+            });
+
+            // Ticket Priorities
+            Route::prefix('ticket-priorities')->name('ticket_priorities.')->group(function (): void {
+                Route::get('/', [App\Http\Controllers\Staff\TicketPriorityController::class, 'index'])->name('index');
+                Route::get('/create', [App\Http\Controllers\Staff\TicketPriorityController::class, 'create'])->name('create');
+                Route::post('/', [App\Http\Controllers\Staff\TicketPriorityController::class, 'store'])->name('store');
+                Route::get('/{ticketPriority}/edit', [App\Http\Controllers\Staff\TicketPriorityController::class, 'edit'])->name('edit');
+                Route::patch('/{ticketPriority}', [App\Http\Controllers\Staff\TicketPriorityController::class, 'update'])->name('update');
+                Route::delete('/{ticketPriority}', [App\Http\Controllers\Staff\TicketPriorityController::class, 'destroy'])->name('destroy');
             });
 
             // Torrent Downloads

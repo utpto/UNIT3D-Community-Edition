@@ -73,14 +73,25 @@
         >
             Posters
         </li>
-        <li
-            class="panel__tab"
-            role="tab"
-            x-bind:class="tab === 'thankers' && 'panel__tab--active'"
-            x-on:click="tab = 'thankers'"
-        >
-            Thankers
-        </li>
+        @if (config('other.thanks-system.is-enabled'))
+            <li
+                class="panel__tab"
+                role="tab"
+                x-bind:class="tab === 'thanked' && 'panel__tab--active'"
+                x-on:click="tab = 'thanked'"
+            >
+                Thanked
+            </li>
+            <li
+                class="panel__tab"
+                role="tab"
+                x-bind:class="tab === 'thankers' && 'panel__tab--active'"
+                x-on:click="tab = 'thankers'"
+            >
+                Thankers
+            </li>
+        @endif
+
         <li
             class="panel__tab"
             role="tab"
@@ -382,6 +393,39 @@
                                     class="user-stat-card__avatar"
                                     alt=""
                                     src="{{ $poster->user->image === null ? url('img/profile.png') : route('authenticated_images.user_avatar', ['user' => $poster->user]) }}"
+                                />
+                            @endif
+                        </article>
+                    @endforeach
+
+                    @break
+                @case('thanked')
+                    @foreach ($this->thanked as $thanked)
+                        <article class="user-stat-card">
+                            <h3 class="user-stat-card__username">
+                                <x-user-tag
+                                    :user="$thanked->user"
+                                    :anon="$thanked->user->privacy?->private_profile"
+                                />
+                                <div title="Place" class="top-users__place">
+                                    {{ Number::ordinal($loop->iteration) }}
+                                </div>
+                            </h3>
+                            <h4 class="user-stat-card__stat">
+                                {{ $thanked->value }} Thanks Received
+                            </h4>
+
+                            @if ($thanked->user->privacy?->private_profile)
+                                <img
+                                    class="user-stat-card__avatar"
+                                    alt=""
+                                    src="{{ url('img/profile.png') }}"
+                                />
+                            @else
+                                <img
+                                    class="user-stat-card__avatar"
+                                    alt=""
+                                    src="{{ $thanked->user->image === null ? url('img/profile.png') : route('authenticated_images.user_avatar', ['user' => $thanked->user]) }}"
                                 />
                             @endif
                         </article>

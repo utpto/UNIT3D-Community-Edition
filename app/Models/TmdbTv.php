@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int                             $id
  * @property string|null                     $tmdb_id
+ * @property bool|null                       $adult
  * @property string|null                     $imdb_id
  * @property string|null                     $tvdb_id
  * @property string|null                     $type
@@ -110,7 +111,17 @@ class TmdbTv extends Model
     public function creators(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(TmdbPerson::class, 'tmdb_credits')
-            ->wherePivot('occupation_id', '=', Occupation::CREATOR->value);
+            ->wherePivot('occupation_id', '=', Occupation::CREATOR);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TmdbPerson, $this>
+     */
+    public function actors(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(TmdbPerson::class, 'tmdb_credits')
+            ->wherePivot('occupation_id', '=', Occupation::ACTOR)
+            ->orderByPivot('order');
     }
 
     /**

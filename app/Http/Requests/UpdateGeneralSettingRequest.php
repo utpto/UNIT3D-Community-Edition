@@ -146,6 +146,10 @@ class UpdateGeneralSettingRequest extends FormRequest
                 'required',
                 'boolean',
             ],
+            'show_adult_content' => [
+                'required',
+                'boolean',
+            ],
         ];
     }
 }

@@ -18,7 +18,7 @@ return [
     'create_a_new_files_backup' => 'Створити резервну копію файлів',
     'create_a_new_db_backup' => 'Створити резервну копію бази даних',
     'create_confirmation_message' => 'Зачекайте кілька хвилин, потім оновіть сторінку.',
-    'create_confirmation_title' => 'Резервне копіювання завершено',
+    'create_confirmation_title' => 'Резервне копіювання розпочато',
     'create_error_message' => 'Не вдалося створити файл резервної копії.',
     'create_error_title' => 'Помилка резервного копіювання',
     'create_warning_message' => 'Ваша резервна копія не може бути створена. Будь ласка, перевірте файли журналу для деталей.',

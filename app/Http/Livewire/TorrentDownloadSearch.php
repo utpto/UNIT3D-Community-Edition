@@ -44,10 +44,18 @@ class TorrentDownloadSearch extends Component
     public string $torrentDownloadType = '';
 
     #[Url(history: true)]
-    public string $from = '';
+    public string $from = '' {
+        set(string $value) {
+            $this->from = $value === '' ? '' : Carbon::parse($value)->format('Y-m-d');
+        }
+    }
 
     #[Url(history: true)]
-    public string $until = '';
+    public string $until = '' {
+        set(string $value) {
+            $this->until = $value === '' ? '' : Carbon::parse($value)->format('Y-m-d');
+        }
+    }
 
     #[Url(history: true)]
     public string $groupBy = 'none';
@@ -70,20 +78,6 @@ class TorrentDownloadSearch extends Component
             // to load the page if it gets the values for all time
             $this->from = now()->subWeek()->format('Y-m-d');
         }
-    }
-
-    final public function updatingFrom(string &$value): void
-    {
-        $value = $value === '' ? '' : Carbon::parse($value)->format('Y-m-d');
-
-        $this->from = $value;
-    }
-
-    final public function updatingUntil(string &$value): void
-    {
-        $value = $value === '' ? '' : Carbon::parse($value)->format('Y-m-d');
-
-        $this->until = $value;
     }
 
     /**

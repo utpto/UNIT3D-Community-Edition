@@ -75,9 +75,9 @@ class RouteServiceProvider extends ServiceProvider
     {
         RateLimiter::for(GlobalRateLimit::WEB, fn (Request $request): Limit => $request->user()
             ? Limit::perMinute(
-                cache()->remember(
+                cache()->flexible(
                     'group:'.$request->user()->group_id.':is_modo',
-                    5,
+                    [5, 10],
                     fn () => $request->user()->group()->value('is_modo')
                 )
                     ? 60
@@ -85,10 +85,10 @@ class RouteServiceProvider extends ServiceProvider
             )
                 ->by('web'.$request->user()->id)
             : Limit::perMinute(8)->by('web'.$request->ip()));
-        RateLimiter::for(GlobalRateLimit::API, fn (Request $request) => Limit::perMinute(30)->by('api'.$request->ip()));
+        RateLimiter::for(GlobalRateLimit::API, fn (Request $request) => Limit::perMinute(30)->by('api'.$request->user()->id));
         RateLimiter::for(GlobalRateLimit::ANNOUNCE, fn (Request $request) => Limit::perMinute(500)->by('announce'.$request->ip()));
-        RateLimiter::for(GlobalRateLimit::CHAT, fn (Request $request) => Limit::perMinute(60)->by('chat'.($request->user()?->id ?? $request->ip())));
-        RateLimiter::for(GlobalRateLimit::RSS, fn (Request $request) => Limit::perMinute(30)->by('rss'.$request->ip()));
+        RateLimiter::for(GlobalRateLimit::CHAT, fn (Request $request) => Limit::perMinute(60)->by('chat'.$request->user()->id));
+        RateLimiter::for(GlobalRateLimit::RSS, fn (Request $request) => Limit::perMinute(30)->by('rss'.$request->user()->id));
         RateLimiter::for(GlobalRateLimit::AUTHENTICATED_IMAGES, fn (Request $request): Limit => Limit::perMinute(200)->by('authenticated-images:'.$request->user()->id));
         RateLimiter::for(GlobalRateLimit::SEARCH, fn (Request $request): Limit => Limit::perMinute(100)->by('search:'.$request->user()->id));
         RateLimiter::for(GlobalRateLimit::TMDB, fn (): Limit => Limit::perSecond(2));

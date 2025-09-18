@@ -9,11 +9,9 @@
     @if ($topics->count() > 0)
         <ul class="topic-listings">
             @foreach ($topics as $topic)
-                @if ($topic->viewable())
-                    <li class="topic-listings__item">
-                        <x-forum.topic-listing :topic="$topic" />
-                    </li>
-                @endif
+                <li class="topic-listings__item">
+                    <x-forum.topic-listing :topic="$topic" />
+                </li>
             @endforeach
         </ul>
     @else

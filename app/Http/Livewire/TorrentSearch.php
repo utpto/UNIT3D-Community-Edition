@@ -234,9 +234,9 @@ class TorrentSearch extends Component
      * Get torrent health statistics.
      */
     final protected object $torrentHealth {
-        get => cache()->remember(
+        get => cache()->flexible(
             'torrent-search:health',
-            3600,
+            [3600, 3600 * 2],
             fn () => DB::table('torrents')
                 ->whereNull('deleted_at')
                 ->selectRaw('COUNT(*) AS total')
@@ -285,9 +285,9 @@ class TorrentSearch extends Component
      * @var \Illuminate\Database\Eloquent\Collection<int, Category>
      */
     final protected \Illuminate\Database\Eloquent\Collection $categories {
-        get => cache()->remember(
+        get => cache()->flexible(
             'categories',
-            3600,
+            [3600, 3600 * 2],
             fn () => Category::query()->orderBy('position')->get(),
         );
     }
@@ -296,9 +296,9 @@ class TorrentSearch extends Component
      * @var \Illuminate\Database\Eloquent\Collection<int, Type>
      */
     final protected \Illuminate\Database\Eloquent\Collection $types {
-        get => cache()->remember(
+        get => cache()->flexible(
             'types',
-            3600,
+            [3600, 3600 * 2],
             fn () => Type::query()->orderBy('position')->get(),
         );
     }
@@ -307,9 +307,9 @@ class TorrentSearch extends Component
      * @var \Illuminate\Database\Eloquent\Collection<int, Resolution>
      */
     final protected \Illuminate\Database\Eloquent\Collection $resolutions {
-        get => cache()->remember(
+        get => cache()->flexible(
             'resolutions',
-            3600,
+            [3600, 3600 * 2],
             fn () => Resolution::query()->orderBy('position')->get(),
         );
     }
@@ -318,9 +318,9 @@ class TorrentSearch extends Component
      * @var \Illuminate\Database\Eloquent\Collection<int, Resolution>
      */
     final protected \Illuminate\Database\Eloquent\Collection $genres {
-        get => cache()->remember(
+        get => cache()->flexible(
             'genres',
-            3600,
+            [3600, 3600 * 2],
             fn () => TmdbGenre::query()->orderBy('name')->get(),
         );
     }
@@ -329,9 +329,9 @@ class TorrentSearch extends Component
      * @var \Illuminate\Database\Eloquent\Collection<int, Region>
      */
     final protected \Illuminate\Database\Eloquent\Collection $regions {
-        get => cache()->remember(
+        get => cache()->flexible(
             'regions',
-            3600,
+            [3600, 3600 * 2],
             fn () => Region::query()->orderBy('position')->get(),
         );
     }
@@ -340,9 +340,9 @@ class TorrentSearch extends Component
      * @var \Illuminate\Database\Eloquent\Collection<int, Distributor>
      */
     final protected \Illuminate\Database\Eloquent\Collection $distributors {
-        get => cache()->remember(
+        get => cache()->flexible(
             'distributors',
-            3600,
+            [3600, 3600 * 2],
             fn () => Distributor::query()->orderBy('name')->get(),
         );
     }
@@ -351,9 +351,9 @@ class TorrentSearch extends Component
      * @var \Illuminate\Support\Collection<int, TmdbMovie>
      */
     final protected \Illuminate\Support\Collection $primaryLanguages {
-        get => cache()->remember(
+        get => cache()->flexible(
             'original-languages',
-            3600,
+            [3600, 3600 * 2],
             fn () => TmdbMovie::query()
                 ->select('original_language')
                 ->distinct()
@@ -382,10 +382,11 @@ class TorrentSearch extends Component
             genreIds: $this->genreIds,
             regionIds: $this->regionIds,
             distributorIds: $this->distributorIds,
-            adult: match ($this->adult) {
-                'include' => true,
-                'exclude' => false,
-                default   => null,
+            adult: match (true) {
+                $this->adult === 'include'                                                       => true,
+                $this->adult === 'exclude'                                                       => false,
+                $this->adult === 'any' && auth()->user()->settings->show_adult_content === false => false,
+                default                                                                          => null,
             },
             tmdbId: $this->tmdbId,
             imdbId: $this->imdbId === '' ? null : ((int) (preg_match('/tt0*(\d{7,})/', $this->imdbId, $matches) ? $matches[1] : $this->imdbId)),
@@ -455,7 +456,6 @@ class TorrentSearch extends Component
             $eagerLoads = fn (Builder $query) => $query
                 ->with(['user:id,username,group_id', 'user.group', 'category', 'type', 'resolution'])
                 ->withCount([
-                    'thanks',
                     'comments',
                     'seeds'   => fn ($query) => $query->where('active', '=', true)->where('visible', '=', true),
                     'leeches' => fn ($query) => $query->where('active', '=', true)->where('visible', '=', true),
@@ -470,17 +470,9 @@ class TorrentSearch extends Component
                     'history as leeching' => fn ($query) => $query->where('user_id', '=', $user->id)
                         ->where('active', '=', 1)
                         ->where('seeder', '=', 0),
-                    'history as not_completed' => fn ($query) => $query->where('user_id', '=', $user->id)
+                    'history as completed' => fn ($query) => $query->where('user_id', '=', $user->id)
                         ->where('active', '=', 0)
-                        ->where('seeder', '=', 0)
-                        ->whereNull('completed_at'),
-                    'history as not_seeding' => fn ($query) => $query->where('user_id', '=', $user->id)
-                        ->where('active', '=', 0)
-                        ->where(
-                            fn ($query) => $query
-                                ->where('seeder', '=', 1)
-                                ->orWhereNotNull('completed_at')
-                        ),
+                        ->where('seeder', '=', 0),
                     'trump',
                 ])
                 ->selectRaw(<<<'SQL'
@@ -529,7 +521,7 @@ class TorrentSearch extends Component
             }
 
             // See app/Traits/TorrentMeta.php
-            $this->scopeMeta($torrents);
+            $this->scopeMeta($torrents, withCredits: true);
 
             return $torrents;
         }
@@ -573,7 +565,12 @@ class TorrentSearch extends Component
                 ->orderBy($this->sortField, $this->sortDirection);
 
             $eagerLoads = fn (Builder $query) => $query
-                ->with(['type:id,name,position', 'resolution:id,name,position'])
+                ->with([
+                    'type:id,name,position',
+                    'resolution:id,name,position',
+                    'category:id,name,position',
+                    'user:id,username,group_id',
+                ])
                 ->select([
                     'id',
                     'name',
@@ -605,7 +602,6 @@ class TorrentSearch extends Component
                     WHEN category_id IN (SELECT id FROM categories WHERE tv_meta = 1) THEN 'tv'
                 END AS meta
             SQL)
-                ->with('user:id,username,group_id', 'category', 'type', 'resolution')
                 ->withCount([
                     'comments',
                 ])
@@ -615,10 +611,6 @@ class TorrentSearch extends Component
                         'seeds'   => fn ($query) => $query->where('active', '=', true)->where('visible', '=', true),
                         'leeches' => fn ($query) => $query->where('active', '=', true)->where('visible', '=', true),
                     ]),
-                )
-                ->when(
-                    config('other.thanks-system.is-enabled'),
-                    fn ($query) => $query->withCount('thanks')
                 )
                 ->withExists([
                     'featured as featured',
@@ -630,17 +622,9 @@ class TorrentSearch extends Component
                     'history as leeching' => fn ($query) => $query->where('user_id', '=', $user->id)
                         ->where('active', '=', 1)
                         ->where('seeder', '=', 0),
-                    'history as not_completed' => fn ($query) => $query->where('user_id', '=', $user->id)
+                    'history as completed' => fn ($query) => $query->where('user_id', '=', $user->id)
                         ->where('active', '=', 0)
-                        ->where('seeder', '=', 0)
-                        ->whereNull('completed_at'),
-                    'history as not_seeding' => fn ($query) => $query->where('user_id', '=', $user->id)
-                        ->where('active', '=', 0)
-                        ->where(
-                            fn ($query) => $query
-                                ->where('seeder', '=', 1)
-                                ->orWhereNotNull('completed_at')
-                        ),
+                        ->where('seeder', '=', 1),
                     'trump',
                 ]);
 

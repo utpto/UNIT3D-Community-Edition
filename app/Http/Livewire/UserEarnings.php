@@ -184,7 +184,6 @@ class UserEarnings extends Component
                 ->where('peers.seeder', '=', true)
                 ->where('peers.active', '=', true)
                 ->where('peers.user_id', '=', $this->user->id)
-                ->where('peers.created_at', '<', now()->subMinutes(30))
                 ->where('torrents.name', 'LIKE', '%'.str_replace(' ', '%', $this->torrentName).'%')
                 ->groupBy(['peers.torrent_id', 'peers.user_id']);
 

@@ -19,8 +19,6 @@ namespace App\Models;
 use App\Enums\ModerationStatus;
 use App\Helpers\StringHelper;
 use App\Models\Scopes\ApprovedScope;
-use App\Notifications\NewComment;
-use App\Notifications\NewThank;
 use App\Traits\Auditable;
 use App\Traits\GroupedLastScope;
 use Illuminate\Database\Eloquent\Builder;
@@ -383,6 +381,7 @@ class Torrent extends Model
                     'year', YEAR(tmdb_tv.first_air_date),
                     'poster', tmdb_tv.poster,
                     'original_language', tmdb_tv.original_language,
+                    'adult', tmdb_tv.adult != 0,
                     'rating', tmdb_tv.vote_average,
                     'companies', (
                         SELECT COALESCE(JSON_ARRAYAGG(JSON_OBJECT(
@@ -560,6 +559,16 @@ class Torrent extends Model
     public function tv(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(TmdbTv::class, 'tmdb_tv_id');
+    }
+
+    /**
+     * Belongs To A Game.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<IgdbGame, $this>
+     */
+    public function game(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(IgdbGame::class, 'igdb_game_id');
     }
 
     /**
@@ -754,6 +763,16 @@ class Torrent extends Model
     }
 
     /**
+     * Has Many Downloads.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<TorrentDownload, $this>
+     */
+    public function downloads(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TorrentDownload::class);
+    }
+
+    /**
      * Trump.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne<TorrentTrump, $this>
@@ -779,41 +798,6 @@ class Torrent extends Model
         $bytes = $this->size;
 
         return StringHelper::formatBytes($bytes, 2);
-    }
-
-    /**
-     * Notify Uploader When An Action Is Taken.
-     */
-    public function notifyUploader(string $type, Thank|Comment $payload): bool
-    {
-        $user = User::with('notification')->findOrFail($this->user_id);
-
-        switch (true) {
-            case $payload instanceof Thank:
-                if ($user->acceptsNotification(auth()->user(), $user, 'torrent', 'show_torrent_thank')) {
-                    $user->notify(new NewThank('torrent', $payload));
-                }
-
-                break;
-            case $payload instanceof Comment:
-                if ($user->acceptsNotification(auth()->user(), $user, 'torrent', 'show_torrent_comment')) {
-                    $user->notify(new NewComment($this, $payload));
-                }
-
-                break;
-        }
-
-        return true;
-    }
-
-    /**
-     * Torrent Is Freeleech.
-     */
-    public function isFreeleech(?User $user = null): bool
-    {
-        $isFreeleech = $user && ($user->group->is_freeleech || cache()->get('personal_freeleech:'.$user->id));
-
-        return $this->free || config('other.freeleech') || $isFreeleech;
     }
 
     /**

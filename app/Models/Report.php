@@ -92,10 +92,7 @@ class Report extends Model
      */
     public function reporter(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class, 'reporter_id')->withDefault([
-            'username' => 'System',
-            'id'       => User::SYSTEM_USER_ID,
-        ]);
+        return $this->belongsTo(User::class, 'reporter_id')->withTrashed();
     }
 
     /**
@@ -105,10 +102,7 @@ class Report extends Model
      */
     public function reported(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class, 'reported_user')->withDefault([
-            'username' => 'System',
-            'id'       => User::SYSTEM_USER_ID,
-        ]);
+        return $this->belongsTo(User::class, 'reported_user')->withTrashed();
     }
 
     /**
@@ -118,9 +112,6 @@ class Report extends Model
      */
     public function staff(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class, 'staff_id')->withDefault([
-            'username' => 'System',
-            'id'       => User::SYSTEM_USER_ID,
-        ]);
+        return $this->belongsTo(User::class, 'staff_id')->withTrashed();
     }
 }

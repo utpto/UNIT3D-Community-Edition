@@ -164,15 +164,4 @@ class Forum extends Model
                     ->when($canStartTopic !== null, fn ($query) => $query->where('start_topic', '=', $canStartTopic))
             );
     }
-
-    /**
-     * Returns The Permission Field.
-     */
-    public function getPermission(): ?ForumPermission
-    {
-        return ForumPermission::query()
-            ->where('group_id', '=', auth()->user()->group_id)
-            ->where('forum_id', '=', $this->id)
-            ->first();
-    }
 }

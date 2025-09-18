@@ -23,7 +23,7 @@
                 {{ __('common.actions') }}
             </h2>
             <div class="panel__body">
-                @if ($forum->getPermission()?->start_topic == true)
+                @if ($permission?->start_topic == true)
                     <div class="form">
                         <p class="form__group form__group--horizontal">
                             <a
