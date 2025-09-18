@@ -158,8 +158,8 @@
             <li class="meta__imdb">
                 <a
                     class="meta-id-tag"
-                    href="https://www.imdb.com/title/tt{{ \str_pad((string) $imdbId, \max(\strlen((string) $imdbId), 7), '0', STR_PAD_LEFT) }}"
-                    title="Internet Movie Database: {{ \str_pad((string) $imdbId, \max(\strlen((string) $imdbId), 7), '0', STR_PAD_LEFT) }}"
+                    href="https://www.imdb.com/title/tt{{ \str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT) }}"
+                    title="Internet Movie Database: {{ \str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT) }}"
                     target="_blank"
                 >
                     <img src="{{ url('/img/meta/imdb.svg') }}" />
