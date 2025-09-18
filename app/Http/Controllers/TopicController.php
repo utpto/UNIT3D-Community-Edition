@@ -29,6 +29,7 @@ use App\Achievements\UserMade800Posts;
 use App\Achievements\UserMade900Posts;
 use App\Achievements\UserMadeFirstPost;
 use App\Models\Forum;
+use App\Models\ForumPermission;
 use App\Models\Post;
 use App\Models\Subscription;
 use App\Models\Topic;
@@ -75,6 +76,10 @@ class TopicController extends Controller
         return view('forum.topic.show', [
             'topic'        => $topic,
             'subscription' => $subscription,
+            'permission'   => ForumPermission::query()
+                ->where('group_id', '=', $user->group_id)
+                ->where('forum_id', '=', $topic->forum_id)
+                ->first(),
         ]);
     }
 
