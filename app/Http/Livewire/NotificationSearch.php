@@ -108,71 +108,30 @@ class NotificationSearch extends Component
         get => auth()->user()->notifications()
             ->select('*')
             ->selectRaw("CASE WHEN read_at IS NULL THEN 'FALSE' ELSE 'TRUE' END as is_read")
-            ->where(function ($query): void {
-                $query->when($this->bon_gifts, function ($query): void {
-                    $query->orWhere('type', '=', \App\Notifications\NewBon::class);
-                })
-                    ->when($this->comment, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewComment::class);
-                    })
-                    ->when($this->comment_tags, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewCommentTag::class);
-                    })
-                    ->when($this->followers, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewFollow::class);
-                    })
-                    ->when($this->playlist_suggestions, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\PlaylistSuggestionCreated::class);
-                    })
-                    ->when($this->playlist_suggestion_rejections, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\PlaylistSuggestionRejected::class);
-                    })
-                    ->when($this->posts, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewPost::class);
-                    })
-                    ->when($this->post_tags, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewPostTag::class);
-                    })
-                    ->when($this->post_tips, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewPostTip::class);
-                    })
-                    ->when($this->request_bounties, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewRequestBounty::class);
-                    })
-                    ->when($this->request_claims, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewRequestClaim::class);
-                    })
-                    ->when($this->request_fills, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewRequestFill::class);
-                    })
-                    ->when($this->request_approvals, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewRequestFillApprove::class);
-                    })
-                    ->when($this->request_rejections, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewRequestFillReject::class);
-                    })
-                    ->when($this->request_unclaims, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewRequestUnclaim::class);
-                    })
-                    ->when($this->reseed_requests, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewReseedRequest::class);
-                    })
-                    ->when($this->thanks, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewThank::class);
-                    })
-                    ->when($this->upload_tips, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewUploadTip::class);
-                    })
-                    ->when($this->topics, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewTopic::class);
-                    })
-                    ->when($this->unfollows, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewUnfollow::class);
-                    })
-                    ->when($this->uploads, function ($query): void {
-                        $query->orWhere('type', '=', \App\Notifications\NewUpload::class);
-                    });
-            })
+            ->where(
+                fn ($query) => $query
+                    ->when($this->bon_gifts, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewBon::class))
+                    ->when($this->comment, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewComment::class))
+                    ->when($this->comment_tags, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewCommentTag::class))
+                    ->when($this->followers, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewFollow::class))
+                    ->when($this->playlist_suggestions, fn ($query) => $query->orWhere('type', '=', \App\Notifications\PlaylistSuggestionCreated::class))
+                    ->when($this->playlist_suggestion_rejections, fn ($query) => $query->orWhere('type', '=', \App\Notifications\PlaylistSuggestionRejected::class))
+                    ->when($this->posts, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewPost::class))
+                    ->when($this->post_tags, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewPostTag::class))
+                    ->when($this->post_tips, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewPostTip::class))
+                    ->when($this->request_bounties, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewRequestBounty::class))
+                    ->when($this->request_claims, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewRequestClaim::class))
+                    ->when($this->request_fills, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewRequestFill::class))
+                    ->when($this->request_approvals, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewRequestFillApprove::class))
+                    ->when($this->request_rejections, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewRequestFillReject::class))
+                    ->when($this->request_unclaims, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewRequestUnclaim::class))
+                    ->when($this->reseed_requests, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewReseedRequest::class))
+                    ->when($this->thanks, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewThank::class))
+                    ->when($this->upload_tips, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewUploadTip::class))
+                    ->when($this->topics, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewTopic::class))
+                    ->when($this->unfollows, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewUnfollow::class))
+                    ->when($this->uploads, fn ($query) => $query->orWhere('type', '=', \App\Notifications\NewUpload::class))
+            )
             ->reorder()
             ->orderBy('is_read')
             ->orderBy($this->sortField, $this->sortDirection)
