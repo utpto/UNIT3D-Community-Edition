@@ -801,16 +801,6 @@ class Torrent extends Model
     }
 
     /**
-     * Torrent Is Freeleech.
-     */
-    public function isFreeleech(?User $user = null): bool
-    {
-        $isFreeleech = $user && ($user->group->is_freeleech || cache()->get('personal_freeleech:'.$user->id));
-
-        return $this->free || config('other.freeleech') || $isFreeleech;
-    }
-
-    /**
      * Get the indexable data array for the model.
      *
      * @return array<string, mixed>
