@@ -44,27 +44,25 @@ class Trending extends Component
 
     #[Url(history: true)]
     #[Validate('sometimes|date_format:Y-m-d')]
-    public string $from = '';
-
-    #[Url(history: true)]
-    #[Validate('sometimes|date_format:Y-m-d')]
-    public string $until = '';
-
-    public function updatingFrom(string &$value): void
-    {
-        try {
-            $value = Carbon::parse($value)->format('Y-m-d');
-        } catch (Throwable) {
-            $value = now()->subDay()->format('Y-m-d');
+    public string $from = '' {
+        set(string $value) {
+            try {
+                $this->from = Carbon::parse($value)->format('Y-m-d');
+            } catch (Throwable) {
+                $this->from = now()->subDay()->format('Y-m-d');
+            }
         }
     }
 
-    public function updatingUntil(string &$value): void
-    {
-        try {
-            $value = Carbon::parse($value)->format('Y-m-d');
-        } catch (Throwable) {
-            $value = now()->format('Y-m-d');
+    #[Url(history: true)]
+    #[Validate('sometimes|date_format:Y-m-d')]
+    public string $until = '' {
+        set(string $value) {
+            try {
+                $this->until = Carbon::parse($value)->format('Y-m-d');
+            } catch (Throwable) {
+                $this->until = now()->format('Y-m-d');
+            }
         }
     }
 
