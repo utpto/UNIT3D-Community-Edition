@@ -90,16 +90,20 @@
                         </li>
                     @elseif ($torrentRequest->season_number === 0 && $torrentRequest->episode_number !== 0)
                         <li class="request__season">
-                            <span>S00E{{ $torrentRequest->episode_number }}</span>
+                            <span>
+                                S00E{{ \str_pad((string) $torrentRequest->episode_number, 2, '0', STR_PAD_LEFT) }}
+                            </span>
                         </li>
                     @elseif ($torrentRequest->season_number !== 0 && $torrentRequest->episode_number === 0)
                         <li class="request__season">
-                            <span>S{{ $torrentRequest->season_number }}</span>
+                            <span>
+                                S{{ \str_pad((string) $torrentRequest->season_number, 2, '0', STR_PAD_LEFT) }}
+                            </span>
                         </li>
                     @elseif ($torrentRequest->season_number !== 0 && $torrentRequest->episode_number !== 0)
                         <li class="request__season">
                             <span>
-                                S{{ $torrentRequest->season_number }}E{{ $torrentRequest->episode_number }}
+                                S{{ \str_pad((string) $torrentRequest->season_number, 2, '0', STR_PAD_LEFT) }}E{{ \str_pad((string) $torrentRequest->episode_number, 2, '0', STR_PAD_LEFT) }}
                             </span>
                         </li>
                     @endif
