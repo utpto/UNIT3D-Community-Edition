@@ -17,7 +17,6 @@ declare(strict_types=1);
 namespace App\Http\Livewire;
 
 use App\Models\Report;
-use App\Models\User;
 use App\Traits\LivewireSort;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -70,9 +69,9 @@ class ReportSearch extends Component
         get => Report::query()
             ->with('reported.group', 'reporter.group', 'staff.group')
             ->when($this->type !== null, fn ($query) => $query->where('type', '=', $this->type))
-            ->when($this->reporter !== null, fn ($query) => $query->whereIn('reporter_id', User::withTrashed()->select('id')->where('username', 'LIKE', '%'.$this->reporter.'%')))
-            ->when($this->reported !== null, fn ($query) => $query->whereIn('reported_user', User::withTrashed()->select('id')->where('username', 'LIKE', '%'.$this->reported.'%')))
-            ->when($this->staff !== null, fn ($query) => $query->whereIn('staff_id', User::withTrashed()->select('id')->where('username', 'LIKE', '%'.$this->staff.'%')))
+            ->when($this->reporter !== null, fn ($query) => $query->whereRelation('reporter', 'username', 'LIKE', '%'.$this->reporter.'%'))
+            ->when($this->reported !== null, fn ($query) => $query->whereRelation('reported', 'username', 'LIKE', '%'.$this->reported.'%'))
+            ->when($this->staff !== null, fn ($query) => $query->whereRelation('staff', 'username', 'LIKE', '%'.$this->staff.'%'))
             ->when($this->title !== null, fn ($query) => $query->where('title', 'LIKE', '%'.str_replace(' ', '%', '%'.$this->title.'%')))
             ->when($this->message !== null, fn ($query) => $query->where('message', 'LIKE', '%'.str_replace(' ', '%', '%'.$this->message.'%')))
             ->when($this->verdict !== null, fn ($query) => $query->where('verdict', 'LIKE', '%'.str_replace(' ', '%', '%'.$this->verdict.'%')))
